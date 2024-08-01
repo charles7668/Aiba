@@ -1,0 +1,6 @@
+@Aiba_HostAddress = http://localhost:5188
+
+GET {{Aiba_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
