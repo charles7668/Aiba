@@ -1,6 +1,12 @@
 @Aiba_HostAddress = http://localhost:5188
 
-GET {{Aiba_HostAddress}}/weatherforecast/
+POST {{Aiba_HostAddress}}/api/Search
 Accept: application/json
+Content-Type: application/json
+
+{
+  "searchType" : "manga",
+  "searchText" : "test"
+}
 
 ###
