@@ -1,4 +1,5 @@
-﻿using Aiba.Model;
+﻿using Aiba.Enums;
+using Aiba.Model;
 
 namespace Aiba.Plugin
 {
@@ -6,7 +7,7 @@ namespace Aiba.Plugin
     {
         public string Name { get; }
 
-        public Task<IEnumerable<MediaInfo>>
-            SearchAsync(string type, string searchText, CancellationToken cancellationToken);
+        public Task<IEnumerable<MediaInfo>> SearchAsync(MediaTypeFlag type, string searchText,
+            CancellationToken cancellationToken);
     }
 }
