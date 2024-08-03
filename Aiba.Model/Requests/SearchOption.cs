@@ -9,5 +9,7 @@ namespace Aiba.Model.Requests
 
         [Required]
         public string SearchText { get; set; } = string.Empty;
+
+        public int Page { get; set; } = 1;
     }
 }

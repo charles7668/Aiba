@@ -1,12 +1,15 @@
 import './App.css';
 import { TopToolBar } from './components/TopToolBar.tsx';
 import { MainContent } from './components/MainContent.tsx';
+import { Box } from '@chakra-ui/react';
 
 function App() {
   return (
     <>
-      <TopToolBar />
-      <MainContent />
+      <Box id={'app-view'} maxW={'100vw'} maxH={'100vh'} overflowY={'auto'}>
+        <TopToolBar id={'top-tool-bar'} />
+        <MainContent />
+      </Box>
     </>
   );
 }
