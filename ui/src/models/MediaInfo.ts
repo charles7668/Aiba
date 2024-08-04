@@ -7,4 +7,6 @@ export interface MediaInfo {
   status: string;
   type: string;
   genres: string[];
+  providerName: string;
+  providerUrl: string;
 }

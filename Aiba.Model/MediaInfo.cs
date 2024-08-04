@@ -17,4 +17,8 @@ public class MediaInfo
     public string Type { get; set; } = string.Empty;
 
     public string[] Genres { get; set; } = [];
+
+    public string ProviderName { get; set; } = string.Empty;
+
+    public string ProviderUrl { get; set; } = string.Empty;
 }

@@ -6,7 +6,8 @@ Content-Type: application/json
 
 {
   "searchType" : "manga",
-  "searchText" : "test"
+  "searchText" : "test",
+  "page" : 1
 }
 
 ###

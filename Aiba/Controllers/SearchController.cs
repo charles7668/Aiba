@@ -37,7 +37,8 @@ namespace Aiba.Controllers
                 foreach (IMediaInfoProvider mediaInfoProvider in providers)
                 {
                     Task<IEnumerable<MediaInfo>> task =
-                        mediaInfoProvider.SearchAsync(flag, searchOption.SearchText, CancellationToken.None);
+                        mediaInfoProvider.SearchAsync(flag, searchOption.SearchText, searchOption.Page,
+                            CancellationToken.None);
                     task.ContinueWith(async t =>
                     {
                         IEnumerable<MediaInfo> infos = await t;

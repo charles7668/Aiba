@@ -5,9 +5,12 @@ namespace Aiba.Plugin
 {
     public interface IMediaInfoProvider
     {
-        public string Name { get; }
+        public string ProviderName { get; }
+
+        public string ProviderUrl { get; }
 
         public Task<IEnumerable<MediaInfo>> SearchAsync(MediaTypeFlag type, string searchText,
+            int page,
             CancellationToken cancellationToken);
     }
 }

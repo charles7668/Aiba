@@ -8,7 +8,7 @@ namespace Aiba.MediaInfoProviders
         {
             foreach (IMediaInfoProvider mediaInfoProvider in providers)
             {
-                if (_providerMap.TryAdd(mediaInfoProvider.Name, mediaInfoProvider))
+                if (_providerMap.TryAdd(mediaInfoProvider.ProviderName, mediaInfoProvider))
                 {
                     _providers.Add(mediaInfoProvider);
                 }
@@ -22,7 +22,7 @@ namespace Aiba.MediaInfoProviders
 
         public string[] GetProviderList()
         {
-            return _providers.Select(x => x.Name).ToArray();
+            return _providers.Select(x => x.ProviderName).ToArray();
         }
 
         public IMediaInfoProvider? GetProvider(string name)

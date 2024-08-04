@@ -5,6 +5,7 @@ import React from 'react';
 import { MediaCard } from './MediaCard.tsx';
 import { Api } from '../services/Api.ts';
 import { MediaInfo } from '../models/MediaInfo.ts';
+import { Pagination } from './Pagination.tsx';
 
 const renderMediaCards = (mediaInfos: MediaInfo[]) => {
   const cards = [];
@@ -18,13 +19,37 @@ const renderMediaCards = (mediaInfos: MediaInfo[]) => {
 
 export const MainContent: React.FC = () => {
   const [mediaInfos, setMediaInfos] = React.useState<MediaInfo[]>([]);
-  const onSearchClick = async (searchText: string) => {
+  const [page, setPage] = React.useState(0);
+  const [hasData, setHasData] = React.useState(false);
+  const [searchText, setSearchText] = React.useState('');
+  const search = async (inputSearchText: string, page: number) => {
+    setSearchText(inputSearchText);
     const response = await Api.search({
       searchType: 'all',
-      searchText: searchText,
-      page: 1,
+      searchText: inputSearchText,
+      page: page,
     });
     setMediaInfos(response);
+  };
+  const onSearchClick = async (searchText: string) => {
+    setPage(1);
+    await search(searchText, 1);
+    setHasData(true);
+  };
+  const onNextPageClick = async () => {
+    if (mediaInfos.length === 0) {
+      // no more data exists
+      return;
+    }
+    setPage(page + 1);
+    await search(searchText, page + 1);
+  };
+  const onPreviousPageClick = async () => {
+    if (page === 1) {
+      return;
+    }
+    setPage(page - 1);
+    await search(searchText, page - 1);
   };
   return (
     <div id="main-content">
@@ -34,6 +59,13 @@ export const MainContent: React.FC = () => {
           <Flex flexWrap={'wrap'} justifyContent={'center'}>
             {renderMediaCards(mediaInfos)}
           </Flex>
+          {hasData && (
+            <Pagination
+              currentPage={page}
+              onNextPageClick={onNextPageClick}
+              onPreviousPageClick={onPreviousPageClick}
+            />
+          )}
         </Flex>
       </Box>
     </div>
