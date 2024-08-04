@@ -1,3 +1,5 @@
+import { ChapterInfo } from './ChapterInfo.ts';
+
 export interface MediaInfo {
   name: string;
   author: string[];
@@ -7,6 +9,8 @@ export interface MediaInfo {
   status: string;
   type: string;
   genres: string[];
+  tags: string[];
+  chapters: ChapterInfo[];
   providerName: string;
   providerUrl: string;
 }

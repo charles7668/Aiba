@@ -128,6 +128,118 @@ namespace Aiba.MediaInfoProviders
             return mediaInfos.AsEnumerable();
         }
 
+        public async Task<MediaInfo> GetDetailInfoAsync(string url, CancellationToken cancellationToken)
+        {
+            var resultInfo = new MediaInfo
+            {
+                Url = url,
+                ProviderUrl = ProviderUrl,
+                ProviderName = ProviderName
+            };
+
+            HttpResponseMessage response;
+            try
+            {
+                response =
+                    await _httpClient.GetAsync(url, cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogError("get media detail info task cancelled");
+                return resultInfo;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("get media detail failed : {Exception}", e.ToString());
+                return resultInfo;
+            }
+
+            string html;
+
+            try
+            {
+                string? format = response.Content.Headers.ContentEncoding.ToString();
+                format ??= "";
+                IDecompressService decompressService = _decompressServiceFactory.GetDecompressService(format);
+                Stream compressedStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                Stream stream = await decompressService.DecompressAsync(
+                    compressedStream,
+                    cancellationToken);
+                html = await new StreamReader(stream).ReadToEndAsync(cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogError("decompress task cancelled");
+                return resultInfo;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("decompress failed : {Exception}", e.ToString());
+                return resultInfo;
+            }
+
+            HtmlDocument document = new();
+            try
+            {
+                document.LoadHtml(html);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("parse html failed : {Exception}", e.ToString());
+                return resultInfo;
+            }
+
+            HtmlNode? titleNode = document.DocumentNode.QuerySelector("#bodywrap > h2");
+            if (titleNode != null)
+            {
+                resultInfo.Name = titleNode.InnerText.Trim();
+            }
+
+            HtmlNode? coverImageNode =
+                document.DocumentNode.QuerySelector("#bodywrap > .asTB > .asTBcell.uwthumb > img");
+            if (coverImageNode != null)
+            {
+                string? src = coverImageNode.Attributes["src"].Value;
+                if (!string.IsNullOrEmpty(src))
+                    resultInfo.ImageUrl = "https:" + src.Trim();
+            }
+
+            HtmlNode? genreNode = document.DocumentNode.QuerySelector(".asTBcell.uwconn > label");
+            if (genreNode != null)
+            {
+                string? genre = genreNode.InnerText;
+                genre ??= "";
+                genre = genre.Replace("分類：", "");
+                resultInfo.Genres = genre.Split('／').Select(x => x.Trim()).ToArray();
+            }
+
+            IList<HtmlNode>? tagNodes =
+                document.DocumentNode.QuerySelectorAll(".asTBcell.uwconn > .addtags > .tagshow");
+            if (tagNodes is { Count: > 0 })
+            {
+                resultInfo.Tags = tagNodes.Select(x => x.InnerText.Trim()).ToArray();
+            }
+
+            HtmlNode? descriptionNode = document.DocumentNode.QuerySelector(".asTBcell.uwconn > p");
+            if (descriptionNode != null)
+            {
+                resultInfo.Description = descriptionNode.InnerText.Replace("簡介：", "").Trim();
+            }
+
+            HtmlNode? chapterNode = document.DocumentNode.QuerySelector(".asTBcell .uwthumb a.btn");
+            if (chapterNode != null)
+            {
+                var info = new ChapterInfo
+                {
+                    ChapterName = resultInfo.Name,
+                    ChapterUrl = ProviderUrl + chapterNode.Attributes["href"].Value
+                };
+                resultInfo.Chapters = [info];
+            }
+
+            return resultInfo;
+        }
+
         private static string BuildSearchUrl(string searchText, int page = 1)
         {
             string encodedSearchText = HttpUtility.UrlEncode(searchText);

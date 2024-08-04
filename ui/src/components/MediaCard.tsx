@@ -27,9 +27,9 @@ const VerticalDotsIcon = createIcon({
 });
 
 export const MediaCard: React.FC<MediaCardProps> = ({
-  mediaInfo,
-  ...props
-}) => {
+                                                      mediaInfo,
+                                                      ...props
+                                                    }) => {
   return (
     <Flex
       flexDirection={'column'}
@@ -53,7 +53,6 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       <Link
         textAlign="start"
         isExternal={true}
-        href={mediaInfo.url}
         display="-webkit-box"
         overflow="hidden"
         textOverflow="ellipsis"
@@ -62,6 +61,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
         }}
+        href={'detail/' + encodeURIComponent(mediaInfo.providerName) + '?url=' + encodeURIComponent(mediaInfo.url)}
       >
         {mediaInfo.name}
       </Link>

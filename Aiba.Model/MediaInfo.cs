@@ -18,6 +18,10 @@ public class MediaInfo
 
     public string[] Genres { get; set; } = [];
 
+    public string[] Tags { get; set; } = [];
+
+    public ChapterInfo[] Chapters { get; set; } = [];
+
     public string ProviderName { get; set; } = string.Empty;
 
     public string ProviderUrl { get; set; } = string.Empty;

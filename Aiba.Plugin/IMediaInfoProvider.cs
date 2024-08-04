@@ -12,5 +12,7 @@ namespace Aiba.Plugin
         public Task<IEnumerable<MediaInfo>> SearchAsync(MediaTypeFlag type, string searchText,
             int page,
             CancellationToken cancellationToken);
+
+        public Task<MediaInfo> GetDetailInfoAsync(string url, CancellationToken cancellationToken);
     }
 }

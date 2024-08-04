@@ -20,6 +20,21 @@ const search = async (params: SearchOption): Promise<MediaInfo[]> => {
   return data as MediaInfo[];
 };
 
+const getDetailInfo = async (providerName: string, url: string): Promise<MediaInfo> => {
+  const encodedProviderName = encodeURIComponent(providerName);
+  const encodedUrl = encodeURIComponent(url);
+  const response = await fetch(baseUrl + '/api/MediaInfo/detail/' + encodedProviderName + '?url=' + encodedUrl);
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const data = await response.json();
+  return data as MediaInfo;
+};
+
 export const Api = {
   search,
+  getDetailInfo,
+  baseUrl,
 };
