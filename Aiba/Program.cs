@@ -1,4 +1,9 @@
+using Aiba.Entities;
 using Aiba.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Aiba
 {
@@ -23,11 +28,30 @@ namespace Aiba
                         .AllowAnyMethod();
                 });
             });
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(option =>
+                {
+                    option.Password.RequireNonAlphanumeric = false;
+                    option.Password.RequireUppercase = false;
+                    option.SignIn.RequireConfirmedAccount = false;
+                    option.SignIn.RequireConfirmedEmail = false;
+                    option.SignIn.RequireConfirmedPhoneNumber = false;
+                    option.User.RequireUniqueEmail = true;
+                    option.Tokens.AuthenticatorTokenProvider = null!;
+                }).AddEntityFrameworkStores<AppDBContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.AddMediaInfoProviders();
             builder.Services.AddDecompressServices();
 
+            builder.Services.AddDbContextFactory<AppDBContext>(option =>
+            {
+                string? connectionString = builder.Configuration["PGDB:connection-string"];
+                option.UseNpgsql(connectionString);
+            });
+
             WebApplication app = builder.Build();
+
+            app.InitDatabase();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -43,6 +67,7 @@ namespace Aiba
                 app.UseCors("allow-all");
             }
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

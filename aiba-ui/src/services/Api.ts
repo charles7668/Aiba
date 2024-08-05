@@ -33,8 +33,25 @@ const getDetailInfo = async (providerName: string, url: string): Promise<MediaIn
   return data as MediaInfo;
 };
 
+const login = async (username: string, password: string) => {
+  const response = await fetch(baseUrl + '/api/Account/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  return await response.json();
+};
+
 export const Api = {
   search,
   getDetailInfo,
+  login,
   baseUrl,
 };
