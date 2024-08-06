@@ -7,39 +7,42 @@ import {
   FormLabel,
   Heading,
   Input,
-  Link,
   useToast,
 } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Api } from '../services/Api.ts';
 import { useLoginInfo } from '../modules/useLoginInfo.ts';
+import { RegisterInfo } from '../models/RegisterInfo.ts';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../modules/useAuth.ts';
 
-export const LoginPage: React.FC = () => {
-  const { userName, password, setUserName, setPassword } = useLoginInfo();
+export const RegisterPage: React.FC = () => {
+  const {
+    userName,
+    password,
+    email,
+    confirmPassword,
+    setUserName,
+    setPassword,
+    setEmail,
+    setConfirmPassword,
+  } = useLoginInfo();
   const toast = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
-  useEffect(() => {
-    const checkLogin = async () => {
-      return await Api.authorizeStatus();
-    };
-    checkLogin().then((response) => {
-      if (response.status === 200) {
-        login();
-        navigate('/');
-      }
-    });
-  });
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const response = await Api.login(userName, password);
+    const response = await Api.register({
+      userName,
+      password,
+      email,
+      confirmPassword,
+    } as RegisterInfo);
     if (!response.ok) {
       const errMessage = await response.text();
       toast({
         title: 'Error ' + response.status,
-        description: 'Failed to login : ' + errMessage,
+        description: 'Failed to register : ' + errMessage,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -74,7 +77,19 @@ export const LoginPage: React.FC = () => {
             />
             <FormHelperText>please input your user name</FormHelperText>
           </FormControl>
-          <FormControl mb={6}>
+          <FormControl mb={4}>
+            <FormLabel>E-mail</FormLabel>
+            <Input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+            <FormHelperText>please input your E-mail</FormHelperText>
+          </FormControl>
+          <FormControl mb={4}>
             <FormLabel>password</FormLabel>
             <Input
               type="password"
@@ -84,15 +99,20 @@ export const LoginPage: React.FC = () => {
             />
             <FormHelperText>please input your password</FormHelperText>
           </FormControl>
+          <FormControl mb={6}>
+            <FormLabel>Confirm Password</FormLabel>
+            <Input
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <FormHelperText>enter your password again</FormHelperText>
+          </FormControl>
           <Button colorScheme="blue" type="submit" width="full">
             Login
           </Button>
         </form>
-        <Box mt={4} textAlign="center">
-          <Link href={'/account/register'} color="teal.500">
-            Don't have an account? Register here
-          </Link>
-        </Box>
       </Box>
     </Flex>
   );

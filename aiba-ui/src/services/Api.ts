@@ -1,5 +1,6 @@
 import { SearchOption } from '../models/SearchOption.ts';
 import { MediaInfo } from '../models/MediaInfo.ts';
+import { RegisterInfo } from '../models/RegisterInfo.ts';
 
 const baseUrl = import.meta.env.VITE_API_BASEURL || '';
 
@@ -20,10 +21,19 @@ const search = async (params: SearchOption): Promise<MediaInfo[]> => {
   return data as MediaInfo[];
 };
 
-const getDetailInfo = async (providerName: string, url: string): Promise<MediaInfo> => {
+const getDetailInfo = async (
+  providerName: string,
+  url: string
+): Promise<MediaInfo> => {
   const encodedProviderName = encodeURIComponent(providerName);
   const encodedUrl = encodeURIComponent(url);
-  const response = await fetch(baseUrl + '/api/MediaInfo/detail/' + encodedProviderName + '?url=' + encodedUrl);
+  const response = await fetch(
+    baseUrl +
+      '/api/MediaInfo/detail/' +
+      encodedProviderName +
+      '?url=' +
+      encodedUrl
+  );
 
   if (!response.ok) {
     throw new Error('Network response was not ok');
@@ -34,24 +44,53 @@ const getDetailInfo = async (providerName: string, url: string): Promise<MediaIn
 };
 
 const login = async (username: string, password: string) => {
-  const response = await fetch(baseUrl + '/api/Account/login', {
+  return await fetch(baseUrl + '/api/Account/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({ username, password }),
   });
+};
 
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
+const register = async (registerInfo: RegisterInfo) => {
+  return await fetch(baseUrl + '/api/Account/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(registerInfo),
+  });
+};
 
-  return await response.json();
+const authorizeStatus = async () => {
+  return await fetch(baseUrl + '/api/Account/status', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+};
+
+const logout = async () => {
+  return await fetch(baseUrl + '/api/Account/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
 };
 
 export const Api = {
   search,
   getDetailInfo,
   login,
+  register,
+  authorizeStatus,
+  logout,
   baseUrl,
 };

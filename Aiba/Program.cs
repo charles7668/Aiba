@@ -1,9 +1,9 @@
 using Aiba.Entities;
 using Aiba.Extensions;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace Aiba
 {
@@ -15,15 +15,22 @@ namespace Aiba
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(configure =>
+            {
+                AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                configure.Filters.Add(new AuthorizeFilter(policy));
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddCors(option =>
             {
-                option.AddPolicy("allow-all", corsPolicyBuilder =>
+                option.AddPolicy("allow-develop-frontend", corsPolicyBuilder =>
                 {
-                    corsPolicyBuilder.AllowAnyOrigin()
+                    corsPolicyBuilder.AllowCredentials()
+                        .WithOrigins(["http://localhost:5173"])
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
@@ -39,6 +46,25 @@ namespace Aiba
                     option.Tokens.AuthenticatorTokenProvider = null!;
                 }).AddEntityFrameworkStores<AppDBContext>()
                 .AddDefaultTokenProviders();
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                // handle 401, 403, 200 status code from frontend
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToLogout = context =>
+                {
+                    context.Response.StatusCode = 200;
+                    return Task.CompletedTask;
+                };
+            });
 
             builder.Services.AddMediaInfoProviders();
             builder.Services.AddDecompressServices();
@@ -47,6 +73,7 @@ namespace Aiba
             {
                 string? connectionString = builder.Configuration["PGDB:connection-string"];
                 option.UseNpgsql(connectionString);
+                option.EnableSensitiveDataLogging(false);
             });
 
             WebApplication app = builder.Build();
@@ -64,7 +91,7 @@ namespace Aiba
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseCors("allow-all");
+                app.UseCors("allow-develop-frontend");
             }
 
             app.UseAuthentication();

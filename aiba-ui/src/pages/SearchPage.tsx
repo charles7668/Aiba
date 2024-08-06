@@ -1,11 +1,12 @@
-import './MainContent.css';
-import { SearchBar } from './SearchBar.tsx';
+import '../components/MainContent.css';
+import { SearchBar } from '../components/SearchBar.tsx';
 import { Box, Flex } from '@chakra-ui/react';
 import React from 'react';
-import { MediaCard } from './MediaCard.tsx';
+import { MediaCard } from '../components/MediaCard.tsx';
 import { Api } from '../services/Api.ts';
 import { MediaInfo } from '../models/MediaInfo.ts';
-import { Pagination } from './Pagination.tsx';
+import { Pagination } from '../components/Pagination.tsx';
+import { TopToolBar } from '../components/TopToolBar.tsx';
 
 const renderMediaCards = (mediaInfos: MediaInfo[]) => {
   const cards = [];
@@ -17,7 +18,7 @@ const renderMediaCards = (mediaInfos: MediaInfo[]) => {
   return cards;
 };
 
-export const MainContent: React.FC = () => {
+export const SearchPage: React.FC = () => {
   const [mediaInfos, setMediaInfos] = React.useState<MediaInfo[]>([]);
   const [page, setPage] = React.useState(0);
   const [hasData, setHasData] = React.useState(false);
@@ -52,22 +53,25 @@ export const MainContent: React.FC = () => {
     await search(searchText, page - 1);
   };
   return (
-    <div id="main-content">
-      <Box css={'max-width: 80%;'} mx={'auto'}>
-        <Flex direction="column">
-          <SearchBar mt={'5px'} mb={'5px'} onSearchClick={onSearchClick} />
-          <Flex flexWrap={'wrap'} justifyContent={'center'}>
-            {renderMediaCards(mediaInfos)}
+    <>
+      <TopToolBar />
+      <div id="main-content">
+        <Box css={'max-width: 80%;'} mx={'auto'}>
+          <Flex direction="column">
+            <SearchBar mt={'5px'} mb={'5px'} onSearchClick={onSearchClick} />
+            <Flex flexWrap={'wrap'} justifyContent={'center'}>
+              {renderMediaCards(mediaInfos)}
+            </Flex>
+            {hasData && (
+              <Pagination
+                currentPage={page}
+                onNextPageClick={onNextPageClick}
+                onPreviousPageClick={onPreviousPageClick}
+              />
+            )}
           </Flex>
-          {hasData && (
-            <Pagination
-              currentPage={page}
-              onNextPageClick={onNextPageClick}
-              onPreviousPageClick={onPreviousPageClick}
-            />
-          )}
-        </Flex>
-      </Box>
-    </div>
+        </Box>
+      </div>
+    </>
   );
 };

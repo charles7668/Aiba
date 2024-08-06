@@ -1,5 +1,6 @@
 ﻿using Aiba.Model;
 using Aiba.Model.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -28,6 +29,7 @@ namespace Aiba.Controllers
         private readonly UserManager<IdentityUser> _userManager;
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginInfo loginInfo)
         {
             if (!ModelState.IsValid)
@@ -52,6 +54,7 @@ namespace Aiba.Controllers
             if (result.Succeeded)
             {
                 _logger.LogInformation("user {User} login success", loginInfo.UserName);
+                var test = _signInManager.IsSignedIn(User);
                 return Ok();
             }
 
@@ -81,6 +84,7 @@ namespace Aiba.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterInfo registerInfo)
         {
             if (!ModelState.IsValid)
@@ -134,6 +138,26 @@ namespace Aiba.Controllers
             }
 
             return BadRequest(ModelState);
+        }
+
+        [HttpGet("status")]
+        [AllowAnonymous]
+        public Task<IActionResult> Status()
+        {
+            if (_signInManager.IsSignedIn(User))
+            {
+                return Task.FromResult<IActionResult>(Ok());
+            }
+
+            return Task.FromResult<IActionResult>(Unauthorized());
+        }
+
+        [HttpPost("logout")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok();
         }
     }
 }

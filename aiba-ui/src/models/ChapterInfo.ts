@@ -1,4 +1,4 @@
-export interface ChapterInfo{
+export interface ChapterInfo {
   chapterName: string;
   chapterUrl: string;
 }
