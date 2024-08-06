@@ -6,7 +6,6 @@ import { MediaCard } from '../components/MediaCard.tsx';
 import { Api } from '../services/Api.ts';
 import { MediaInfo } from '../models/MediaInfo.ts';
 import { Pagination } from '../components/Pagination.tsx';
-import { TopToolBar } from '../components/TopToolBar.tsx';
 
 const renderMediaCards = (mediaInfos: MediaInfo[]) => {
   const cards = [];
@@ -54,7 +53,6 @@ export const SearchPage: React.FC = () => {
   };
   return (
     <>
-      <TopToolBar />
       <div id="main-content">
         <Box css={'max-width: 80%;'} mx={'auto'}>
           <Flex direction="column">

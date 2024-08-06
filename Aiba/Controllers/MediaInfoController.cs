@@ -3,7 +3,6 @@ using Aiba.MediaInfoProviders;
 using Aiba.Model;
 using Aiba.Plugin;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using System.Web;
 
 namespace Aiba.Controllers
@@ -13,14 +12,14 @@ namespace Aiba.Controllers
     public class MediaInfoController : Controller
     {
         public MediaInfoController(MediaProviderFactory mediaProviderFactory, ILogger<MediaInfoController> logger,
-            IDbContextPool<AppDBContext> contextPool)
+            AppDBContext context)
         {
             _mediaProviderFactory = mediaProviderFactory;
             _logger = logger;
-            _contextPool = contextPool;
+            _context = context;
         }
 
-        private readonly IDbContextPool<AppDBContext> _contextPool;
+        private readonly AppDBContext _context;
 
         private readonly ILogger<MediaInfoController> _logger;
 

@@ -7,22 +7,34 @@ import { RegisterPage } from './pages/RegisterPage.tsx';
 import { HomePage } from './pages/HomePage.tsx';
 import { SearchPage } from './pages/SearchPage.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
+import { ProfileSetting, SettingsPage } from './pages/SettingsPage.tsx';
+import { useAuth } from './modules/useAuth.ts';
+import React, { useEffect } from 'react';
+import { Api } from './services/Api.ts';
+import { TopToolBar } from './components/TopToolBar.tsx';
+
+export const ProtectedComponent: React.FC<{ child: React.ReactNode }> = ({
+  child,
+}) => {
+  return (
+    <>
+      <TopToolBar />
+      <Box id={'app-view'} maxW={'100vw'} maxH={'100vh'} overflowY={'auto'}>
+        <ProtectedRoute>{child}</ProtectedRoute>
+      </Box>
+    </>
+  );
+};
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <ProtectedRoute>
-        <HomePage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedComponent child={<HomePage />}></ProtectedComponent>,
   },
   {
     path: '/detail/:providerName',
     element: (
-      <ProtectedRoute>
-        <MediaDetailPage />
-      </ProtectedRoute>
+      <ProtectedComponent child={<MediaDetailPage />}></ProtectedComponent>
     ),
   },
   {
@@ -35,20 +47,34 @@ const router = createBrowserRouter([
   },
   {
     path: '/search',
-    element: (
-      <ProtectedRoute>
-        <SearchPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedComponent child={<SearchPage />}></ProtectedComponent>,
+  },
+  {
+    path: '/settings',
+    element: <ProtectedComponent child={<SettingsPage />}></ProtectedComponent>,
+    children: [
+      {
+        path: 'profile',
+        element: <ProfileSetting />,
+      },
+    ],
   },
 ]);
 
 function App() {
+  const { login, logout } = useAuth();
+  useEffect(() => {
+    Api.authorizeStatus().then((res) => {
+      if (res.status !== 200) {
+        logout();
+      } else {
+        login();
+      }
+    });
+  }, [login, logout]);
   return (
     <>
-      <Box id={'app-view'} maxW={'100vw'} maxH={'100vh'} overflowY={'auto'}>
-        <RouterProvider router={router} />
-      </Box>
+      <RouterProvider router={router} />
     </>
   );
 }

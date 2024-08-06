@@ -13,7 +13,6 @@ import React, { useEffect, useState } from 'react';
 import { MediaInfo } from '../models/MediaInfo';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Api } from '../services/Api.ts';
-import { TopToolBar } from '../components/TopToolBar.tsx';
 
 const mediaInfoGenres: React.FC<{ mediaInfo: MediaInfo }> = ({ mediaInfo }) => {
   return (
@@ -32,7 +31,6 @@ const mediaInfoGenres: React.FC<{ mediaInfo: MediaInfo }> = ({ mediaInfo }) => {
 const mediaInfoTags: React.FC<{ mediaInfo: MediaInfo }> = ({ mediaInfo }) => {
   return (
     <>
-      <TopToolBar />
       {mediaInfo.tags.map((tag, index) => {
         return (
           <Badge key={index} colorScheme="purple">

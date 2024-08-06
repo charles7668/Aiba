@@ -10,6 +10,7 @@ const search = async (params: SearchOption): Promise<MediaInfo[]> => {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(params),
   });
 
@@ -32,7 +33,11 @@ const getDetailInfo = async (
       '/api/MediaInfo/detail/' +
       encodedProviderName +
       '?url=' +
-      encodedUrl
+      encodedUrl,
+    {
+      method: 'GET',
+      credentials: 'include',
+    }
   );
 
   if (!response.ok) {

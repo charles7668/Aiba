@@ -12,8 +12,7 @@ import {
   Spacer,
   useColorModeValue,
 } from '@chakra-ui/react';
-import React from 'react';
-import './TopToolBar.module.css';
+import React, { useEffect } from 'react';
 import { MdAccountCircle } from 'react-icons/md';
 import { Api } from '../services/Api.ts';
 import { useAuth, AuthContextType } from '../modules/useAuth.ts';
@@ -27,6 +26,7 @@ const getUserIconMenuItems = (
     return (
       <>
         <MenuItem>Profile</MenuItem>
+        <MenuItem onClick={() => navigate('/settings')}>Settings</MenuItem>
         <Divider />
         <MenuItem
           onClick={async () => {
@@ -52,11 +52,28 @@ const getUserIconMenuItems = (
 export const TopToolBar: React.FC<{ id?: string }> = ({ id = null }) => {
   const bg = useColorModeValue('white', 'black');
   const color = useColorModeValue('black', 'white');
-  const authContext = useAuth();
+  const { isLoggedIn, login, logout } = useAuth();
+  const [loginStatus, setLoginStatus] = React.useState(false);
   const navigate = useNavigate();
+  useEffect(() => {
+    if (isLoggedIn) {
+      setLoginStatus(true);
+    } else {
+      setLoginStatus(false);
+    }
+  }, [isLoggedIn]);
 
   return (
-    <Box {...(id && { id })} bg={bg} px={4} py={2}>
+    <Box
+      {...(id && { id })}
+      bg={bg}
+      px={4}
+      py={2}
+      pos={'sticky'}
+      left={0}
+      right={0}
+      zIndex={1000}
+    >
       <Flex align="center" p={0}>
         <Link to={'/'}>
           <Box px={3}>
@@ -81,7 +98,12 @@ export const TopToolBar: React.FC<{ id?: string }> = ({ id = null }) => {
             fontSize="40px"
             aria-label={'account'}
           />
-          <MenuList>{getUserIconMenuItems(authContext, navigate)}</MenuList>
+          <MenuList>
+            {getUserIconMenuItems(
+              { isLoggedIn: loginStatus, login, logout },
+              navigate
+            )}
+          </MenuList>
         </Menu>
       </Flex>
     </Box>
