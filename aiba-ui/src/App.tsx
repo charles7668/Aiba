@@ -16,8 +16,8 @@ import { LibrarySetting } from './components/LibrarySetting.tsx';
 import { CollectionPage } from './pages/CollectionPage.tsx';
 
 export const ProtectedComponent: React.FC<{ child: React.ReactNode }> = ({
-  child,
-}) => {
+                                                                           child,
+                                                                         }) => {
   return (
     <>
       <TopToolBar />

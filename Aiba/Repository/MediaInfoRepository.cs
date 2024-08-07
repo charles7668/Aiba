@@ -8,5 +8,11 @@ namespace Aiba.Repository
         {
             await context.MediaInfos.AddAsync(mediaInfo);
         }
+
+        public Task<IEnumerable<MediaInfoEntity>> GetMediaInfosByLibraryAsync(LibraryEntity libraryEntity)
+        {
+            return Task.FromResult<IEnumerable<MediaInfoEntity>>(
+                context.MediaInfos.Where(x => x.LibraryId == libraryEntity.Id));
+        }
     }
 }

@@ -13,8 +13,11 @@ namespace Aiba.Repository
         {
             var libraryEntity = new LibraryEntity();
             LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
+            libraryEntity = await LibraryRepository.GetLibraryEntitiesByUserIdAndNameAsync(userId, libraryEntity);
+            if (libraryEntity == null)
+                throw new ArgumentException("library not found");
             IEnumerable<MediaInfoEntity> mediaEntities =
-                await LibraryRepository.GetMediasByUserIdAndLibraryNameAsync(userId, libraryEntity);
+                await MediaInfoRepository.GetMediaInfosByLibraryAsync(libraryEntity);
             List<MediaInfo> result = [];
             foreach (MediaInfoEntity mediaEntity in mediaEntities)
             {

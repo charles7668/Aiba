@@ -1,7 +1,5 @@
 ﻿using Aiba.Entities;
 using Aiba.Exceptions;
-using Microsoft.EntityFrameworkCore;
-using System.Data.Entity;
 
 namespace Aiba.Repository
 {
@@ -11,17 +9,6 @@ namespace Aiba.Repository
         {
             return Task.FromResult(
                 context.Libraries.FirstOrDefault(l => l.UserId == userId && l.Name == library.Name));
-        }
-
-        public async Task<IEnumerable<MediaInfoEntity>> GetMediasByUserIdAndLibraryNameAsync(string userId,
-            LibraryEntity library)
-        {
-            LibraryEntity? libraryEntity =
-                await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(
-                    QueryableExtensions.Include(context.Libraries, x => x.MediaInfos));
-            if (libraryEntity == null)
-                return [];
-            return libraryEntity.MediaInfos;
         }
 
         public Task RemoveLibraryEntityByUserIdAsync(string id, LibraryEntity library)

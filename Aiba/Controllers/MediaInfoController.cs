@@ -70,5 +70,34 @@ namespace Aiba.Controllers
 
             return Ok();
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MediaInfo>>> GetMediaInfosFromLibrary([FromQuery] string libraryName)
+        {
+            string? userId = _userManager.GetUserId(User);
+            _logger.LogInformation("MediaInfoController.GetMediaInfosFromLibrary called by userId: {userId}", userId);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            LibraryInfo libraryInfo = new()
+            {
+                Name = libraryName
+            };
+
+            IEnumerable<MediaInfo> mediaInfos;
+            try
+            {
+                mediaInfos = await _unitOfWord.GetMediaInfosFromLibrary(userId, libraryInfo);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("GetMediaInfosFromLibrary failed : {Exception}", e.ToString());
+                return BadRequest($"GetMediaInfosFromLibrary failed : {e.Message}");
+            }
+
+            return Ok(mediaInfos);
+        }
     }
 }
