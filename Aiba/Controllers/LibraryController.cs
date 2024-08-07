@@ -45,6 +45,7 @@ namespace Aiba.Controllers
         }
 
         [HttpGet]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<IEnumerable<LibraryInfo>>> GetLibraries()
         {
             string? id = _signInManager.UserManager.GetUserId(User);

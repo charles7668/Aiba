@@ -30,6 +30,7 @@ namespace Aiba.Controllers
         private readonly UserManager<IdentityUser> _userManager;
 
         [HttpGet("detail/{providerName}")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None)]
         public async Task<ActionResult<MediaInfo>> GetDetail(string providerName, [FromQuery] string url)
         {
             string decodeProviderName = HttpUtility.UrlDecode(providerName);
@@ -72,6 +73,7 @@ namespace Aiba.Controllers
         }
 
         [HttpGet]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<IEnumerable<MediaInfo>>> GetMediaInfosFromLibrary([FromQuery] string libraryName)
         {
             string? userId = _userManager.GetUserId(User);

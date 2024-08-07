@@ -67,6 +67,8 @@ namespace Aiba
                 };
             });
 
+            builder.Services.AddResponseCaching();
+
             builder.Services.AddMediaInfoProviders();
             builder.Services.AddDecompressServices();
 
@@ -99,6 +101,8 @@ namespace Aiba
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseResponseCaching();
 
             app.MapControllers();
 
