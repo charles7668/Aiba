@@ -7,6 +7,7 @@ namespace Aiba.Repository
     public class UnitOfWork(AppDBContext context) : IUnitOfWork
     {
         private ILibraryRepository LibraryRepository { get; } = new LibraryRepository(context);
+        private IMediaInfoRepository MediaInfoRepository { get; } = new MediaInfoRepository(context);
 
         public async Task<IEnumerable<MediaInfo>> GetMediaInfosFromLibrary(string userId, LibraryInfo libraryInfo)
         {
@@ -50,6 +51,21 @@ namespace Aiba.Repository
             var libraryEntity = new LibraryEntity();
             LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
             await LibraryRepository.RemoveLibraryEntityByUserIdAsync(userId, libraryEntity);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task AddMediaInfoToLibraryAsync(string userId, LibraryInfo libraryInfo, MediaInfo mediaInfo)
+        {
+            var libraryEntity = new LibraryEntity();
+            LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
+            libraryEntity = await LibraryRepository.GetLibraryEntitiesByUserIdAndNameAsync(userId, libraryEntity);
+            if (libraryEntity == null)
+                throw new ArgumentException("library not found");
+            var mediaEntity = new MediaInfoEntity();
+            MediaInfoEntityMapping.MapFrom(mediaEntity, mediaInfo);
+            mediaEntity.LibraryId = libraryEntity.Id;
+            mediaEntity.Library = libraryEntity;
+            await MediaInfoRepository.AddMediaInfo(mediaEntity);
             await context.SaveChangesAsync();
         }
     }

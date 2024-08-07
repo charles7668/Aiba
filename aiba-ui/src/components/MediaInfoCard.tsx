@@ -5,19 +5,18 @@ import {
   Spacer,
   Text,
   Menu,
-  MenuList,
-  MenuItem,
   MenuButton,
   IconButton,
   createIcon,
 } from '@chakra-ui/react';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { MediaInfo } from '../models/MediaInfo.ts';
 
 interface MediaCardProps {
   mx?: string;
   my?: string;
   mediaInfo: MediaInfo;
+  menuComponents?: ReactNode;
 }
 
 const VerticalDotsIcon = createIcon({
@@ -26,8 +25,9 @@ const VerticalDotsIcon = createIcon({
   d: 'M12 16a2 2 0 110 4 2 2 0 010-4zm0-6a2 2 0 110 4 2 2 0 010-4zm0-6a2 2 0 110 4 2 2 0 010-4z',
 });
 
-export const MediaCard: React.FC<MediaCardProps> = ({
+export const MediaInfoCard: React.FC<MediaCardProps> = ({
   mediaInfo,
+  menuComponents,
   ...props
 }) => {
   return (
@@ -85,14 +85,10 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           position="absolute"
           variant={'unstyled'}
           size={'xs'}
-          bottom="4px"
-          right="4px"
+          bottom="0"
+          right="0"
         />
-        <MenuList>
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </MenuList>
+        {menuComponents}
       </Menu>
     </Flex>
   );

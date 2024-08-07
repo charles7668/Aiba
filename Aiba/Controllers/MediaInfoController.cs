@@ -1,7 +1,9 @@
-﻿using Aiba.Entities;
-using Aiba.MediaInfoProviders;
+﻿using Aiba.MediaInfoProviders;
 using Aiba.Model;
+using Aiba.Model.RequestParams;
 using Aiba.Plugin;
+using Aiba.Repository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
 
@@ -12,18 +14,20 @@ namespace Aiba.Controllers
     public class MediaInfoController : Controller
     {
         public MediaInfoController(MediaProviderFactory mediaProviderFactory, ILogger<MediaInfoController> logger,
-            AppDBContext context)
+            IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager)
         {
             _mediaProviderFactory = mediaProviderFactory;
             _logger = logger;
-            _context = context;
+            _unitOfWord = unitOfWork;
+            _userManager = userManager;
         }
 
-        private readonly AppDBContext _context;
 
         private readonly ILogger<MediaInfoController> _logger;
 
         private readonly MediaProviderFactory _mediaProviderFactory;
+        private readonly IUnitOfWork _unitOfWord;
+        private readonly UserManager<IdentityUser> _userManager;
 
         [HttpGet("detail/{providerName}")]
         public async Task<ActionResult<MediaInfo>> GetDetail(string providerName, [FromQuery] string url)
@@ -42,6 +46,29 @@ namespace Aiba.Controllers
 
             MediaInfo detailInfo = await provider.GetDetailInfoAsync(decodeUrl, CancellationToken.None);
             return Ok(detailInfo);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddMediaInfoToLibrary(AddMediaInfoRequest request)
+        {
+            string? userId = _userManager.GetUserId(User);
+            _logger.LogInformation("MediaInfoController.AddMediaInfoToLibrary called with userId: {userId}", userId);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await _unitOfWord.AddMediaInfoToLibraryAsync(userId, request.LibraryInfo, request.MediaInfo);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("AddMediaInfoToLibrary failed : {Exception}", e.ToString());
+                return BadRequest($"AddMediaInfoToLibrary failed : {e.Message}");
+            }
+
+            return Ok();
         }
     }
 }

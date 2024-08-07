@@ -123,6 +123,20 @@ const deleteLibrary = async (info: LibraryInfo) => {
   });
 };
 
+const addMediaInfoToLibrary = async (
+  mediaInfo: MediaInfo,
+  libraryInfo: LibraryInfo
+) => {
+  return await fetch(baseUrl + '/api/mediaInfo', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ mediaInfo, libraryInfo }),
+  });
+};
+
 export const Api = {
   search,
   getDetailInfo,
@@ -133,5 +147,6 @@ export const Api = {
   getLibraries,
   addLibrary,
   deleteLibrary,
+  addMediaInfoToLibrary,
   baseUrl,
 };
