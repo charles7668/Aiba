@@ -25,20 +25,20 @@ const search = async (params: SearchOption): Promise<MediaInfo[]> => {
 
 const getDetailInfo = async (
   providerName: string,
-  url: string,
+  url: string
 ): Promise<MediaInfo> => {
   const encodedProviderName = encodeURIComponent(providerName);
   const encodedUrl = encodeURIComponent(url);
   const response = await fetch(
     baseUrl +
-    '/api/MediaInfo/detail/' +
-    encodedProviderName +
-    '?url=' +
-    encodedUrl,
+      '/api/MediaInfo/detail/' +
+      encodedProviderName +
+      '?url=' +
+      encodedUrl,
     {
       method: 'GET',
       credentials: 'include',
-    },
+    }
   );
 
   if (!response.ok) {
@@ -125,7 +125,7 @@ const deleteLibrary = async (info: LibraryInfo) => {
 
 const addMediaInfoToLibrary = async (
   mediaInfo: MediaInfo,
-  libraryInfo: LibraryInfo,
+  libraryInfo: LibraryInfo
 ) => {
   return await fetch(baseUrl + '/api/mediaInfo', {
     method: 'POST',
@@ -137,13 +137,16 @@ const addMediaInfoToLibrary = async (
   });
 };
 const getMediaInfosFromLibrary = async (libraryInfo: LibraryInfo) => {
-  return await fetch(baseUrl + '/api/mediaInfo?libraryName=' + libraryInfo.name, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
+  return await fetch(
+    baseUrl + '/api/mediaInfo?libraryName=' + libraryInfo.name,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    }
+  );
 };
 
 export const Api = {

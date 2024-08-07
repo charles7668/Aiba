@@ -89,13 +89,6 @@ export const TopToolBar: React.FC<{ id?: string }> = ({ id = null }) => {
             </Heading>
           </Box>
         </Link>
-        <Link to={'/collection'}>
-          <Box px={3}>
-            <Heading size="md" color={color}>
-              Collection
-            </Heading>
-          </Box>
-        </Link>
         <Spacer />
         <Menu>
           <MenuButton

@@ -13,11 +13,10 @@ import React, { useEffect } from 'react';
 import { Api } from './services/Api.ts';
 import { TopToolBar } from './components/TopToolBar.tsx';
 import { LibrarySetting } from './components/LibrarySetting.tsx';
-import { CollectionPage } from './pages/CollectionPage.tsx';
 
 export const ProtectedComponent: React.FC<{ child: React.ReactNode }> = ({
-                                                                           child,
-                                                                         }) => {
+  child,
+}) => {
   return (
     <>
       <TopToolBar />
@@ -50,12 +49,6 @@ const router = createBrowserRouter([
   {
     path: '/search',
     element: <ProtectedComponent child={<SearchPage />}></ProtectedComponent>,
-  },
-  {
-    path: '/collection',
-    element: (
-      <ProtectedComponent child={<CollectionPage />}></ProtectedComponent>
-    ),
   },
   {
     path: '/settings',
