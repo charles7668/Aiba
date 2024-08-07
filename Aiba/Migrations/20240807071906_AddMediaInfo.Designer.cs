@@ -3,6 +3,7 @@ using System;
 using Aiba.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aiba.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240807071906_AddMediaInfo")]
+    partial class AddMediaInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace Aiba.Migrations
 
                     b.HasIndex("Title");
 
-                    b.ToTable("Chapters", (string)null);
+                    b.ToTable("Chapters");
                 });
 
             modelBuilder.Entity("Aiba.Entities.GenreEntity", b =>
@@ -74,7 +77,7 @@ namespace Aiba.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Genres", (string)null);
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("Aiba.Entities.LibraryEntity", b =>
@@ -119,7 +122,7 @@ namespace Aiba.Migrations
 
                     b.HasIndex("UserId", "Type");
 
-                    b.ToTable("Libraries", (string)null);
+                    b.ToTable("Libraries");
                 });
 
             modelBuilder.Entity("Aiba.Entities.MediaInfoEntity", b =>
@@ -187,7 +190,7 @@ namespace Aiba.Migrations
 
                     b.HasIndex("Type");
 
-                    b.ToTable("MediaInfos", (string)null);
+                    b.ToTable("MediaInfos");
                 });
 
             modelBuilder.Entity("Aiba.Entities.TagEntity", b =>
@@ -212,7 +215,7 @@ namespace Aiba.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

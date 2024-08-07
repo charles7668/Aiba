@@ -2,6 +2,7 @@ using Aiba.Enums;
 using Aiba.Extensions;
 using Aiba.MediaInfoProviders;
 using Aiba.Model;
+using Aiba.Model.Extensions;
 using Aiba.Plugin;
 using Microsoft.AspNetCore.Mvc;
 using SearchOption = Aiba.Model.Requests.SearchOption;

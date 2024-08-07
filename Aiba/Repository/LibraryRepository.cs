@@ -1,10 +1,29 @@
 ﻿using Aiba.Entities;
 using Aiba.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using System.Data.Entity;
 
 namespace Aiba.Repository
 {
     public class LibraryRepository(AppDBContext context) : ILibraryRepository
     {
+        public Task<LibraryEntity?> GetLibraryEntitiesByUserIdAndNameAsync(string userId, LibraryEntity library)
+        {
+            return Task.FromResult(
+                context.Libraries.FirstOrDefault(l => l.UserId == userId && l.Name == library.Name));
+        }
+
+        public async Task<IEnumerable<MediaInfoEntity>> GetMediasByUserIdAndLibraryNameAsync(string userId,
+            LibraryEntity library)
+        {
+            LibraryEntity? libraryEntity =
+                await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(
+                    QueryableExtensions.Include(context.Libraries, x => x.MediaInfos));
+            if (libraryEntity == null)
+                return [];
+            return libraryEntity.MediaInfos;
+        }
+
         public Task RemoveLibraryEntityByUserIdAsync(string id, LibraryEntity library)
         {
             LibraryEntity? entity = context.Libraries.FirstOrDefault(l => l.UserId == id && l.Name == library.Name);

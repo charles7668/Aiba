@@ -30,5 +30,7 @@ namespace Aiba.Entities
         public string UserId { get; set; } = string.Empty;
 
         public IdentityUser User { get; set; } = null!;
+
+        public List<MediaInfoEntity> MediaInfos { get; set; } = [];
     }
 }

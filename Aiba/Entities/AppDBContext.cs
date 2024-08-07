@@ -12,6 +12,14 @@ namespace Aiba.Entities
 
         public DbSet<LibraryEntity> Libraries { get; set; }
 
+        public DbSet<MediaInfoEntity> MediaInfos { get; set; }
+
+        public DbSet<GenreEntity> Genres { get; set; }
+
+        public DbSet<TagEntity> Tags { get; set; }
+
+        public DbSet<ChapterEntity> Chapters { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

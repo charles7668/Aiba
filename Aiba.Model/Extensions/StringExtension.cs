@@ -1,7 +1,7 @@
 ﻿using Aiba.Enums;
 using Aiba.Model.Constants;
 
-namespace Aiba.Extensions
+namespace Aiba.Model.Extensions
 {
     public static class StringExtension
     {

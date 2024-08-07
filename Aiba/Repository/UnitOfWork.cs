@@ -1,4 +1,5 @@
-﻿using Aiba.Entities;
+﻿using Aiba.DataMapping;
+using Aiba.Entities;
 using Aiba.Model;
 
 namespace Aiba.Repository
@@ -7,35 +8,48 @@ namespace Aiba.Repository
     {
         private ILibraryRepository LibraryRepository { get; } = new LibraryRepository(context);
 
+        public async Task<IEnumerable<MediaInfo>> GetMediaInfosFromLibrary(string userId, LibraryInfo libraryInfo)
+        {
+            var libraryEntity = new LibraryEntity();
+            LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
+            IEnumerable<MediaInfoEntity> mediaEntities =
+                await LibraryRepository.GetMediasByUserIdAndLibraryNameAsync(userId, libraryEntity);
+            List<MediaInfo> result = [];
+            foreach (MediaInfoEntity mediaEntity in mediaEntities)
+            {
+                var info = new MediaInfo();
+                MediaInfoEntityMapping.Map(mediaEntity, info);
+                result.Add(info);
+            }
+
+            return result;
+        }
+
         public async Task AddLibraryInfoByUserIdAsync(string userId, LibraryInfo libraryInfo)
         {
-            await LibraryRepository.AddLibraryEntityByUserIdAsync(userId, new LibraryEntity
-            {
-                Name = libraryInfo.Name,
-                Path = libraryInfo.Path,
-                Type = libraryInfo.Type
-            });
+            var libraryEntity = new LibraryEntity();
+            LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
+            await LibraryRepository.AddLibraryEntityByUserIdAsync(userId, libraryEntity);
             await context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<LibraryInfo>> GetLibraryInfosByUserIdAsync(string userId)
         {
             IEnumerable<LibraryEntity> entities = await LibraryRepository.GetLibraryEntitiesByUserIdAsync(userId);
-            IEnumerable<LibraryInfo> result = entities.Select(x => new LibraryInfo
+            IEnumerable<LibraryInfo> result = entities.Select(x =>
             {
-                Name = x.Name,
-                Path = x.Path,
-                Type = x.Type
+                var info = new LibraryInfo();
+                LibraryEntityMapping.Map(x, info);
+                return info;
             });
             return result;
         }
 
         public async Task RemoveLibraryByUserIdAsync(string userId, LibraryInfo libraryInfo)
         {
-            await LibraryRepository.RemoveLibraryEntityByUserIdAsync(userId, new LibraryEntity
-            {
-                Name = libraryInfo.Name
-            });
+            var libraryEntity = new LibraryEntity();
+            LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
+            await LibraryRepository.RemoveLibraryEntityByUserIdAsync(userId, libraryEntity);
             await context.SaveChangesAsync();
         }
     }
