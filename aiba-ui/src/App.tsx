@@ -12,6 +12,7 @@ import { useAuth } from './modules/useAuth.ts';
 import React, { useEffect } from 'react';
 import { Api } from './services/Api.ts';
 import { TopToolBar } from './components/TopToolBar.tsx';
+import { LibrarySetting } from './components/LibrarySetting.tsx';
 
 export const ProtectedComponent: React.FC<{ child: React.ReactNode }> = ({
   child,
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfileSetting />,
+      },
+      {
+        path: 'library',
+        element: <LibrarySetting />,
       },
     ],
   },

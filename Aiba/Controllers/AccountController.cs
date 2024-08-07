@@ -54,7 +54,6 @@ namespace Aiba.Controllers
             if (result.Succeeded)
             {
                 _logger.LogInformation("user {User} login success", loginInfo.UserName);
-                var test = _signInManager.IsSignedIn(User);
                 return Ok();
             }
 

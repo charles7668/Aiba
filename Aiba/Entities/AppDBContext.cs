@@ -10,6 +10,8 @@ namespace Aiba.Entities
         {
         }
 
+        public DbSet<LibraryEntity> Libraries { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

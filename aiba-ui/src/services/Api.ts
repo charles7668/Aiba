@@ -1,6 +1,7 @@
 import { SearchOption } from '../models/SearchOption.ts';
 import { MediaInfo } from '../models/MediaInfo.ts';
 import { RegisterInfo } from '../models/RegisterInfo.ts';
+import { LibraryInfo } from '../models/LibraryInfo.ts';
 
 const baseUrl = import.meta.env.VITE_API_BASEURL || '';
 
@@ -90,6 +91,38 @@ const logout = async () => {
   });
 };
 
+const getLibraries = async () => {
+  return await fetch(baseUrl + '/api/Library', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+};
+
+const addLibrary = async (info: LibraryInfo) => {
+  return await fetch(baseUrl + '/api/Library', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(info),
+  });
+};
+
+const deleteLibrary = async (info: LibraryInfo) => {
+  return await fetch(baseUrl + '/api/Library', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(info),
+  });
+};
+
 export const Api = {
   search,
   getDetailInfo,
@@ -97,5 +130,8 @@ export const Api = {
   register,
   authorizeStatus,
   logout,
+  getLibraries,
+  addLibrary,
+  deleteLibrary,
   baseUrl,
 };

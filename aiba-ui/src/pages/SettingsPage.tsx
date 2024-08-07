@@ -1,44 +1,46 @@
 import React from 'react';
 import {
   Box,
-  Heading,
+  Button,
+  Divider,
   Flex,
   FormControl,
   FormLabel,
-  Input,
-  Switch,
-  Button,
-  Divider,
-  Text,
-  Stack,
+  Heading,
   Icon,
+  Input,
+  Stack,
+  Switch,
+  Text,
   VStack,
 } from '@chakra-ui/react';
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { MdDashboard } from 'react-icons/md';
+import { VscLibrary } from 'react-icons/vsc';
 
 const SidebarItem: React.FC<{
   icon: React.ElementType;
   title: string;
   to: string;
 }> = ({ icon, title, to }) => {
+  const navigate = useNavigate();
   return (
-    <Link to={to}>
-      <Box
-        w={'100%'}
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        cursor="pointer"
-        p={3}
-        _hover={{ bg: 'gray.700' }}
-      >
-        <Box display="flex" alignItems="center">
-          <Icon as={icon} mr={3} boxSize={6} />
-          <Text>{title}</Text>
-        </Box>
+    <Box
+      onClick={() => navigate(to)}
+      minW={'100%'}
+      w={'100%'}
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      cursor="pointer"
+      p={3}
+      _hover={{ bg: 'gray.700' }}
+    >
+      <Box display="flex" alignItems="center">
+        <Icon as={icon} mr={3} boxSize={6} />
+        <Text>{title}</Text>
       </Box>
-    </Link>
+    </Box>
   );
 };
 
@@ -117,11 +119,16 @@ export const SettingsPage: React.FC = () => {
   return (
     <>
       <Box display={'flex'} justifyContent={'start'}>
-        <VStack align="start" spacing={4}>
+        <VStack align="start" spacing={4} minW={'10em'}>
           <SidebarItem
             icon={MdDashboard}
             title="Profile"
             to={'/settings/profile'}
+          ></SidebarItem>
+          <SidebarItem
+            icon={VscLibrary}
+            title="Library"
+            to={'/settings/library'}
           ></SidebarItem>
         </VStack>
         <Box flex={'1'}>

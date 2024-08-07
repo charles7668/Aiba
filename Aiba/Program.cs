@@ -1,5 +1,6 @@
 using Aiba.Entities;
 using Aiba.Extensions;
+using Aiba.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -75,6 +76,8 @@ namespace Aiba
                 option.UseNpgsql(connectionString);
                 option.EnableSensitiveDataLogging(false);
             });
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             WebApplication app = builder.Build();
 
