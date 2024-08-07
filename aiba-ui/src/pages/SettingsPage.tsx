@@ -7,42 +7,13 @@ import {
   FormControl,
   FormLabel,
   Heading,
-  Icon,
   Input,
   Stack,
   Switch,
-  Text,
-  VStack,
 } from '@chakra-ui/react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { MdDashboard } from 'react-icons/md';
+import { Outlet } from 'react-router-dom';
+import { SideBar } from '../components/SideBar.tsx';
 import { VscLibrary } from 'react-icons/vsc';
-
-const SidebarItem: React.FC<{
-  icon: React.ElementType;
-  title: string;
-  to: string;
-}> = ({ icon, title, to }) => {
-  const navigate = useNavigate();
-  return (
-    <Box
-      onClick={() => navigate(to)}
-      minW={'100%'}
-      w={'100%'}
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      cursor="pointer"
-      p={3}
-      _hover={{ bg: 'gray.700' }}
-    >
-      <Box display="flex" alignItems="center">
-        <Icon as={icon} mr={3} boxSize={6} />
-        <Text>{title}</Text>
-      </Box>
-    </Box>
-  );
-};
 
 export const ProfileSetting: React.FC = () => {
   return (
@@ -116,21 +87,17 @@ export const ProfileSetting: React.FC = () => {
 };
 
 export const SettingsPage: React.FC = () => {
+  const sideBarItems = [
+    {
+      icon: VscLibrary,
+      title: 'Library',
+      to: '/settings/library',
+    },
+  ];
   return (
     <>
       <Box display={'flex'} justifyContent={'start'}>
-        <VStack align="start" spacing={4} minW={'10em'}>
-          <SidebarItem
-            icon={MdDashboard}
-            title="Profile"
-            to={'/settings/profile'}
-          ></SidebarItem>
-          <SidebarItem
-            icon={VscLibrary}
-            title="Library"
-            to={'/settings/library'}
-          ></SidebarItem>
-        </VStack>
+        <SideBar items={sideBarItems} />
         <Box flex={'1'}>
           <Outlet />
         </Box>
