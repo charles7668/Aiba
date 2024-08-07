@@ -6,12 +6,18 @@ import { IconType } from 'react-icons';
 const SidebarItem: React.FC<{
   icon: React.ElementType;
   title: string;
-  to: string;
+  to: string | (() => void);
 }> = ({ icon, title, to }) => {
   const navigate = useNavigate();
   return (
     <Box
-      onClick={() => navigate(to)}
+      onClick={() => {
+        if (typeof to === 'string') {
+          navigate(to);
+          return;
+        }
+        to();
+      }}
       minW={'100%'}
       w={'100%'}
       display="flex"
@@ -30,7 +36,7 @@ const SidebarItem: React.FC<{
 };
 
 export const SideBar: React.FC<{
-  items: Array<{ icon: IconType; title: string; to: string }>;
+  items: Array<{ icon: IconType; title: string; to: string | (() => void) }>;
 }> = ({ items }) => {
   return (
     <VStack align="start" spacing={4} minW={'10em'}>
