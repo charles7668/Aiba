@@ -1,0 +1,62 @@
+﻿using Aiba.Model;
+using Aiba.Model.RequestParams;
+using Aiba.Plugin.Scanner;
+using Aiba.Repository;
+using Aiba.Scanners;
+using Aiba.TaskManager;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
+
+namespace Aiba.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ScanController : Controller
+    {
+        public ScanController(ScannerFactory scannerFactory, ILogger<ScanController> logger,
+            UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, ITaskManager taskManager)
+        {
+            _scannerFactory = scannerFactory;
+            _logger = logger;
+            _userManager = userManager;
+            _unitOfWork = unitOfWork;
+            _taskManager = taskManager;
+        }
+
+        private readonly ILogger<ScanController> _logger;
+        private readonly ScannerFactory _scannerFactory;
+        private readonly ITaskManager _taskManager;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<IdentityUser> _userManager;
+
+        [HttpPost("mediaInfos")]
+        public async Task<IActionResult> ScanMediaInfos(ScanMediaInfoRequest request)
+        {
+            string? userId = _userManager.GetUserId(User);
+            if (userId == null)
+                return Unauthorized();
+            _logger.LogInformation("Scanning media infos by user {User} , Librayry : {LibraryName}", userId,
+                request.LibraryName);
+            LibraryInfo libraryInfo = await _unitOfWork.GetLibraryInfoByUserIdAndNameAsync(userId, request.LibraryName);
+            string scannerName = libraryInfo.ScannerName;
+            IScanner? scanner = _scannerFactory.GetScanner(scannerName);
+            if (scanner == null)
+            {
+                _logger.LogError("Scanner {ScannerName} not found", scannerName);
+                return BadRequest("Scanner not found");
+            }
+
+            string taskName = userId + libraryInfo.Name;
+            CancellationTokenSource cancellationTokenSource = _taskManager.CreateCancellationTokenSource(taskName);
+
+            _taskManager.EnqueueTask(taskName,
+                () => TaskExecutor.ScanningTask(userId, libraryInfo, scannerName,
+                    cancellationTokenSource.Token));
+            return Ok(new Dictionary<string, string>
+            {
+                { "taskName", taskName }
+            });
+        }
+    }
+}

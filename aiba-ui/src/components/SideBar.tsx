@@ -40,8 +40,9 @@ export const SideBar: React.FC<{
 }> = ({ items }) => {
   return (
     <VStack align="start" spacing={4} minW={'10em'}>
-      {items.map((item) => (
+      {items.map((item, index) => (
         <SidebarItem
+          key={index}
           icon={item.icon}
           title={item.title}
           to={item.to}

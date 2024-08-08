@@ -1,6 +1,8 @@
 using Aiba.Entities;
 using Aiba.Extensions;
 using Aiba.Repository;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -10,6 +12,8 @@ namespace Aiba
 {
     public class Program
     {
+        public static IServiceProvider ServiceProvider { get; set; } = null!;
+
         public static void Main(string[] args)
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -44,7 +48,7 @@ namespace Aiba
                     option.SignIn.RequireConfirmedEmail = false;
                     option.SignIn.RequireConfirmedPhoneNumber = false;
                     option.User.RequireUniqueEmail = true;
-                    option.Tokens.AuthenticatorTokenProvider = null!;
+                    option.Tokens.AuthenticatorTokenProvider = string.Empty;
                 }).AddEntityFrameworkStores<AppDBContext>()
                 .AddDefaultTokenProviders();
             builder.Services.ConfigureApplicationCookie(options =>
@@ -72,6 +76,11 @@ namespace Aiba
             builder.Services.AddMediaInfoProviders();
             builder.Services.AddDecompressServices();
 
+            builder.Services.AddHangfire(config => config.UseMemoryStorage());
+            builder.Services.AddHangfireServer();
+            builder.Services.AddScanners();
+            builder.Services.AddTaskManager();
+
             builder.Services.AddDbContextFactory<AppDBContext>(option =>
             {
                 string? connectionString = builder.Configuration["PGDB:connection-string"];
@@ -82,6 +91,8 @@ namespace Aiba
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             WebApplication app = builder.Build();
+
+            ServiceProvider = app.Services;
 
             app.InitDatabase();
 

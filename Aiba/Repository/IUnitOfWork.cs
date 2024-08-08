@@ -9,5 +9,6 @@ namespace Aiba.Repository
         public Task<IEnumerable<LibraryInfo>> GetLibraryInfosByUserIdAsync(string userId);
         public Task RemoveLibraryByUserIdAsync(string userId, LibraryInfo libraryInfo);
         public Task AddMediaInfoToLibraryAsync(string userId, LibraryInfo libraryInfo, MediaInfo mediaInfo);
+        public Task<LibraryInfo> GetLibraryInfoByUserIdAndNameAsync(string userId, string name);
     }
 }

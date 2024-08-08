@@ -10,6 +10,7 @@ namespace Aiba.DataMapping
             output.Name = input.Name;
             output.Path = input.Path;
             output.Type = input.Type;
+            output.ScannerName = input.ScannerName;
         }
 
         public static void MapFrom(LibraryEntity output, LibraryInfo input)
@@ -17,6 +18,7 @@ namespace Aiba.DataMapping
             output.Name = input.Name;
             output.Path = input.Path;
             output.Type = input.Type;
+            output.ScannerName = input.ScannerName;
         }
     }
 }

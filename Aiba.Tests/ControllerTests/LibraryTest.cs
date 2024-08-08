@@ -124,21 +124,39 @@ namespace Aiba.Tests.ControllerTests
             var controller = new LibraryController(unitOfWork, logger, signInManager);
             // test with invalid user
             _fakeSignInUserId = "InvalidUser";
-            IActionResult result = await controller.AddLibrary(new LibraryInfo());
+            IActionResult result = await controller.AddLibrary(new LibraryInfo()
+            {
+                Path = AppDomain.CurrentDomain.BaseDirectory
+            });
             Assert.IsInstanceOfType(result, typeof(UnauthorizedResult));
 
             // test internal server error
             _fakeSignInUserId = "TestUser1";
             _fakeAddLibraryThrowError = true;
-            result = await controller.AddLibrary(new LibraryInfo());
+            result = await controller.AddLibrary(new LibraryInfo()
+            {
+                Path = AppDomain.CurrentDomain.BaseDirectory
+            });
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
             Assert.AreEqual((result as ObjectResult)?.StatusCode, 500);
 
             // test success
             _fakeSignInUserId = "TestUser1";
             _fakeAddLibraryThrowError = false;
-            result = await controller.AddLibrary(new LibraryInfo());
+            result = await controller.AddLibrary(new LibraryInfo()
+            {
+                Path = AppDomain.CurrentDomain.BaseDirectory
+            });
             Assert.IsInstanceOfType(result, typeof(OkResult));
+
+            // test directory not exist
+            _fakeSignInUserId = "TestUser1";
+            _fakeAddLibraryThrowError = false;
+            result = await controller.AddLibrary(new LibraryInfo
+            {
+                Path = "InvalidPath"
+            });
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
         }
 
         [TestMethod]

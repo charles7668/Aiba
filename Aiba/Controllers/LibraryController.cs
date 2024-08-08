@@ -30,6 +30,12 @@ namespace Aiba.Controllers
                 return Unauthorized();
             }
 
+            // check directory exist
+            if (!Directory.Exists(libraryInfo.Path))
+            {
+                return BadRequest("Directory not exist");
+            }
+
             _logger.LogInformation("LibraryController.AddLibraryInfoByUserId called by User : {UserId}", id);
             try
             {

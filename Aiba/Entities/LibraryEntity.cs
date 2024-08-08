@@ -29,8 +29,9 @@ namespace Aiba.Entities
         [MaxLength(255)]
         public string UserId { get; set; } = string.Empty;
 
-        public IdentityUser User { get; set; } = null!;
+        [MaxLength(255)]
+        public string ScannerName { get; set; } = string.Empty;
 
-        public ICollection<MediaInfoEntity> MediaInfos { get; set; } = [];
+        public IdentityUser User { get; set; } = null!;
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Aiba.DataMapping;
 using Aiba.Entities;
 using Aiba.Enums;
-using Aiba.Extensions;
 using Aiba.Model;
 using Aiba.Model.Extensions;
 
@@ -53,20 +52,24 @@ namespace Aiba.Tests
             {
                 Name = "test",
                 Path = "test",
-                Type = MediaTypeFlag.MANGA
+                Type = MediaTypeFlag.MANGA,
+                ScannerName = "test"
             };
             var libraryInfo = new LibraryInfo();
             LibraryEntityMapping.Map(libraryEntity, libraryInfo);
             Assert.AreEqual(libraryEntity.Name, libraryInfo.Name);
             Assert.AreEqual(libraryEntity.Path, libraryInfo.Path);
             Assert.AreEqual(libraryEntity.Type, libraryInfo.Type);
+            Assert.AreEqual(libraryEntity.ScannerName, libraryInfo.ScannerName);
             libraryInfo.Name = "new-test";
             libraryInfo.Path = "new-test";
             libraryInfo.Type = MediaTypeFlag.VIDEO;
+            libraryInfo.ScannerName = "new-test";
             LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
             Assert.AreEqual(libraryInfo.Name, libraryEntity.Name);
             Assert.AreEqual(libraryInfo.Path, libraryEntity.Path);
             Assert.AreEqual(libraryInfo.Type, libraryEntity.Type);
+            Assert.AreEqual(libraryInfo.ScannerName, libraryEntity.ScannerName);
         }
 
         [TestMethod]

@@ -7,5 +7,6 @@ namespace Aiba.Model
         public string Name { get; set; } = string.Empty;
         public string Path { get; set; } = string.Empty;
         public MediaTypeFlag Type { get; set; }
+        public string ScannerName { get; set; } = string.Empty;
     }
 }

@@ -71,5 +71,20 @@ namespace Aiba.Repository
             await MediaInfoRepository.AddMediaInfo(mediaEntity);
             await context.SaveChangesAsync();
         }
+
+        public async Task<LibraryInfo> GetLibraryInfoByUserIdAndNameAsync(string userId, string name)
+        {
+            var libraryEntity = new LibraryEntity
+            {
+                UserId = userId,
+                Name = name
+            };
+            libraryEntity = await LibraryRepository.GetLibraryEntitiesByUserIdAndNameAsync(userId, libraryEntity);
+            if (libraryEntity == null)
+                throw new ArgumentException("library not found");
+            var libraryInfo = new LibraryInfo();
+            LibraryEntityMapping.Map(libraryEntity, libraryInfo);
+            return libraryInfo;
+        }
     }
 }
