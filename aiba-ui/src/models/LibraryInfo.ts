@@ -4,4 +4,5 @@ export interface LibraryInfo {
   name: string;
   path: string;
   type: MediaTypeFlag;
+  scannerName: string;
 }

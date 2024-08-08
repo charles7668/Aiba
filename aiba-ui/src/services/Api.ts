@@ -149,6 +149,19 @@ const getMediaInfosFromLibrary = async (libraryInfo: LibraryInfo) => {
   );
 };
 
+const getScanner = async (mediaTypeFlagNumber: number) => {
+  return await fetch(
+    baseUrl + '/api/Scan/scanner?flagNumber=' + mediaTypeFlagNumber,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    }
+  );
+};
+
 export const Api = {
   search,
   getDetailInfo,
@@ -161,5 +174,6 @@ export const Api = {
   deleteLibrary,
   addMediaInfoToLibrary,
   getMediaInfosFromLibrary,
+  getScanner,
   baseUrl,
 };

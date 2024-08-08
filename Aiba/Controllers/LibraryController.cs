@@ -24,6 +24,9 @@ namespace Aiba.Controllers
         [HttpPost]
         public async Task<IActionResult> AddLibrary(LibraryInfo libraryInfo)
         {
+            if (string.IsNullOrEmpty(libraryInfo.ScannerName))
+                return BadRequest("ScannerName is required");
+
             string? id = _signInManager.UserManager.GetUserId(User);
             if (id == null)
             {
@@ -60,7 +63,7 @@ namespace Aiba.Controllers
                 return Unauthorized();
             }
 
-            _logger.LogInformation("LibraryController.GetLibraryInfosByUserId called with userId: {userId}", id);
+            _logger.LogInformation("LibraryController.GetLibraryInfosByUserId called with userId: {UserId}", id);
             IEnumerable<LibraryInfo> libraryInfos = await _unitOfWork.GetLibraryInfosByUserIdAsync(id);
             return Ok(libraryInfos);
         }

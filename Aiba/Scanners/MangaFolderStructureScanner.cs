@@ -1,4 +1,5 @@
-﻿using Aiba.Model;
+﻿using Aiba.Enums;
+using Aiba.Model;
 using Aiba.Plugin.Scanner;
 
 namespace Aiba.Scanners
@@ -14,6 +15,7 @@ namespace Aiba.Scanners
             ".gif"
         };
 
+        public MediaTypeFlag SupportedMediaType { get; } = MediaTypeFlag.MANGA;
         public string Name { get; } = "MangaFolderStructureScanner";
 
         public Task<Result> ScanAsync(string libraryRootPath, Func<MediaInfo, Result> callback,

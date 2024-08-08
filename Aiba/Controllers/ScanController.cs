@@ -1,4 +1,5 @@
-﻿using Aiba.Model;
+﻿using Aiba.Enums;
+using Aiba.Model;
 using Aiba.Model.RequestParams;
 using Aiba.Plugin.Scanner;
 using Aiba.Repository;
@@ -6,7 +7,6 @@ using Aiba.Scanners;
 using Aiba.TaskManager;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 
 namespace Aiba.Controllers
 {
@@ -29,6 +29,14 @@ namespace Aiba.Controllers
         private readonly ITaskManager _taskManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<IdentityUser> _userManager;
+
+        [HttpGet("scanner")]
+        public Task<ActionResult<IEnumerable<string>>> GetScanners([FromQuery] int flagNumber)
+        {
+            var flag = (MediaTypeFlag)flagNumber;
+            return Task.FromResult<ActionResult<IEnumerable<string>>>(Ok(_scannerFactory.GetScannersByMediaType(flag)
+                .Select(x => x.Name)));
+        }
 
         [HttpPost("mediaInfos")]
         public async Task<IActionResult> ScanMediaInfos(ScanMediaInfoRequest request)

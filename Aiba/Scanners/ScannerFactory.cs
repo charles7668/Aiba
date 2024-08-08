@@ -1,4 +1,5 @@
-﻿using Aiba.Plugin.Scanner;
+﻿using Aiba.Enums;
+using Aiba.Plugin.Scanner;
 
 namespace Aiba.Scanners
 {
@@ -8,11 +9,21 @@ namespace Aiba.Scanners
         {
             foreach (IScanner scanner in scanners)
             {
-                _scanners.TryAdd(scanner.Name, scanner);
+                if (_scanners.TryAdd(scanner.Name, scanner))
+                    _scannerList.Add(scanner);
             }
         }
 
+        private readonly List<IScanner> _scannerList = [];
+
         private readonly Dictionary<string, IScanner> _scanners = [];
+
+        public IEnumerable<IScanner> GetScannersByMediaType(MediaTypeFlag flag)
+        {
+            return _scannerList.Where(x =>
+                (flag.HasFlag(MediaTypeFlag.MANGA) && x.SupportedMediaType.HasFlag(MediaTypeFlag.MANGA))
+                || (flag.HasFlag(MediaTypeFlag.VIDEO) && x.SupportedMediaType.HasFlag(MediaTypeFlag.VIDEO)));
+        }
 
         public IScanner? GetScanner(string scannerName)
         {

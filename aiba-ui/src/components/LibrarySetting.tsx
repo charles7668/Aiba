@@ -22,7 +22,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { MdAdd, MdDelete } from 'react-icons/md';
-import { SimpleAlertDialog } from '../components/SimpleAlertDialog.tsx';
+import { SimpleAlertDialog } from './SimpleAlertDialog.tsx';
 import { Api } from '../services/Api.ts';
 import { MediaTypeFlag } from '../models/MediaTypeEnum.ts';
 import { LibraryInfo } from '../models/LibraryInfo.ts';
@@ -89,10 +89,12 @@ const LibraryAddInputModal: React.FC<{
     name,
     path,
     type,
+    scanner,
   }: {
     name: string;
     path: string;
     type: MediaTypeFlag;
+    scanner: string;
   }) => Promise<{
     success: boolean;
     error: string;
@@ -103,6 +105,8 @@ const LibraryAddInputModal: React.FC<{
   const [errorOpen, setErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [type, setType] = useState<MediaTypeFlag>(MediaTypeFlag.MANGA);
+  const [scanners, setScanners] = useState<Array<string>>([]);
+  const [scannerName, setScannerName] = useState<string>('');
 
   const handleInputNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputName(e.target.value);
@@ -112,7 +116,12 @@ const LibraryAddInputModal: React.FC<{
   };
 
   const handleSubmit = async () => {
-    const result = await onSubmit({ name: inputName, path: inputPath, type });
+    const result = await onSubmit({
+      name: inputName,
+      path: inputPath,
+      type,
+      scanner: scannerName,
+    });
     if (!result.success) {
       setErrorOpen(true);
       setErrorMessage(result.error);
@@ -123,6 +132,17 @@ const LibraryAddInputModal: React.FC<{
     setType(MediaTypeFlag.MANGA);
     onClose();
   };
+
+  useEffect(() => {
+    Api.getScanner(type).then(async (response) => {
+      if (response.status !== 200) {
+        return;
+      }
+      const temp: Array<string> = await response.json();
+      if (temp.length > 0) setScannerName(temp[0]);
+      setScanners(temp);
+    });
+  }, [type]);
 
   return (
     <>
@@ -164,6 +184,17 @@ const LibraryAddInputModal: React.FC<{
                     </option>
                   ))}
               </Select>
+              <FormLabel>Scanner</FormLabel>
+              <Select
+                value={scannerName}
+                onChange={(e) => setScannerName(e.target.value)}
+              >
+                {scanners.map((key) => (
+                  <option key={key} value={key}>
+                    {key}
+                  </option>
+                ))}
+              </Select>
             </FormControl>
           </ModalBody>
 
@@ -189,15 +220,18 @@ export const LibrarySetting: React.FC = () => {
     name,
     path,
     type,
+    scanner,
   }: {
     name: string;
     path: string;
     type: MediaTypeFlag;
+    scanner: string;
   }) => {
     const response = await Api.addLibrary({
       name: name,
       path: path,
       type: type,
+      scannerName: scanner,
     });
     if (response.status !== 200) {
       return {
@@ -205,7 +239,7 @@ export const LibrarySetting: React.FC = () => {
         error: 'Failed to add library : ' + (await response.text()),
       };
     }
-    setLibraries([...libraries, { name, path, type }]);
+    setLibraries([...libraries, { name, path, type, scannerName: scanner }]);
     return { success: true, error: '' };
   };
   const onRemoveLibrary = async (info: LibraryInfo) => {
