@@ -126,7 +126,8 @@ namespace Aiba.Tests.ControllerTests
             _fakeSignInUserId = "InvalidUser";
             IActionResult result = await controller.AddLibrary(new LibraryInfo()
             {
-                Path = AppDomain.CurrentDomain.BaseDirectory
+                Path = AppDomain.CurrentDomain.BaseDirectory,
+                ScannerName = "Test"
             });
             Assert.IsInstanceOfType(result, typeof(UnauthorizedResult));
 
@@ -135,7 +136,8 @@ namespace Aiba.Tests.ControllerTests
             _fakeAddLibraryThrowError = true;
             result = await controller.AddLibrary(new LibraryInfo()
             {
-                Path = AppDomain.CurrentDomain.BaseDirectory
+                Path = AppDomain.CurrentDomain.BaseDirectory,
+                ScannerName = "Test"
             });
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
             Assert.AreEqual((result as ObjectResult)?.StatusCode, 500);
@@ -145,16 +147,27 @@ namespace Aiba.Tests.ControllerTests
             _fakeAddLibraryThrowError = false;
             result = await controller.AddLibrary(new LibraryInfo()
             {
-                Path = AppDomain.CurrentDomain.BaseDirectory
+                Path = AppDomain.CurrentDomain.BaseDirectory,
+                ScannerName = "Test"
             });
             Assert.IsInstanceOfType(result, typeof(OkResult));
+
+            // test empty scanner
+            _fakeSignInUserId = "TestUser1";
+            _fakeAddLibraryThrowError = false;
+            result = await controller.AddLibrary(new LibraryInfo
+            {
+                Path = AppDomain.CurrentDomain.BaseDirectory,
+            });
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
 
             // test directory not exist
             _fakeSignInUserId = "TestUser1";
             _fakeAddLibraryThrowError = false;
             result = await controller.AddLibrary(new LibraryInfo
             {
-                Path = "InvalidPath"
+                Path = "InvalidPath",
+                ScannerName = "Test"
             });
             Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
         }

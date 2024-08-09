@@ -73,7 +73,10 @@ namespace Aiba.Repository
             LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
             if (libraryEntity == null)
                 throw new ArgumentException("library not found");
-            var mediaEntity = new MediaInfoEntity();
+            MediaInfoEntity? mediaEntity = await MediaInfoRepository.GetMediaInfo(libraryEntity.Id, mediaInfo.Url);
+            if (mediaEntity != null)
+                throw new ArgumentException("media already exists");
+            mediaEntity = new MediaInfoEntity();
             MediaInfoEntityMapping.MapFrom(mediaEntity, mediaInfo);
             mediaEntity.LibraryId = libraryEntity.Id;
             mediaEntity.Library = libraryEntity;

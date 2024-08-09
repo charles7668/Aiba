@@ -10,8 +10,8 @@ namespace Aiba.Entities
     [Index(nameof(LibraryId))]
     [Index(nameof(ImageUrl))]
     [Index(nameof(Url))]
-    [Index(nameof(LibraryId), nameof(ImageUrl))]
-    [Index(nameof(LibraryId), nameof(Url))]
+    [Index(nameof(LibraryId), nameof(ImageUrl), IsUnique = true)]
+    [Index(nameof(LibraryId), nameof(Url), IsUnique = true)]
     public class MediaInfoEntity
     {
         public int Id { get; set; }

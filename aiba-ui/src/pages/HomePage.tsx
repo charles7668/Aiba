@@ -13,13 +13,46 @@ export const HomePage: React.FC = () => {
   const [mediaInfos, setMediaInfos] = React.useState<Array<MediaInfo>>([]);
   const [selectedLibrary, setSelectedLibrary] =
     React.useState<LibraryInfo | null>(null);
-  const getMediaInfos = async (library: LibraryInfo) => {
+  const [isScanning, setIsScanning] = React.useState(false);
+  let timerId: NodeJS.Timeout | undefined = undefined;
+
+  const updateMediaInfos = async (library: LibraryInfo) => {
     const response = await Api.getMediaInfosFromLibrary(library);
     if (response.status !== 200) {
       return;
     }
     const mediaInfos = await response.json();
     setMediaInfos(mediaInfos);
+  };
+  const startScanTask = async () => {
+    if (selectedLibrary === null) {
+      return;
+    }
+    const response = await Api.startMediaInfoScan({
+      libraryName: selectedLibrary.name,
+    });
+    if (response.status !== 200) {
+      return;
+    }
+    setIsScanning(true);
+    timerId = setInterval(async () => {
+      const response = await Api.getMediaInfoScanStatus(selectedLibrary.name);
+      if (response.status !== 200) {
+        // if response is not success then not need to update
+        setIsScanning(false);
+        clearInterval(timerId);
+        return;
+      } else if ((await response.text()) === 'false') {
+        setIsScanning(false);
+        clearInterval(timerId);
+      }
+      await updateMediaInfos(selectedLibrary);
+    }, 2000);
+    return () => {
+      if (timerId !== undefined) {
+        clearInterval(timerId);
+      }
+    };
   };
   useEffect(() => {
     Api.getLibraries().then(async (response) => {
@@ -34,7 +67,7 @@ export const HomePage: React.FC = () => {
             title: library.name,
             to: async () => {
               setSelectedLibrary(library);
-              await getMediaInfos(library);
+              await updateMediaInfos(library);
             },
           };
         })
@@ -45,16 +78,17 @@ export const HomePage: React.FC = () => {
     <Box display={'flex'} justifyContent={'start'}>
       <SideBar items={libraries}></SideBar>
       <Box flex={'1'}>
-        <MediaInfoList
-          mediaInfos={mediaInfos}
-          libraryInfo={selectedLibrary}
-          mediaInfoNeedUpdateCallback={() => {
-            if (selectedLibrary === null) {
-              return;
-            }
-            getMediaInfos(selectedLibrary).then(() => {});
-          }}
-        />
+        {selectedLibrary !== null && (
+          <Box>
+            <IconButton
+              isLoading={isScanning}
+              aria-label="scan"
+              icon={<MdRefresh />}
+              onClick={() => startScanTask()}
+            ></IconButton>
+          </Box>
+        )}
+        <MediaInfoList mediaInfos={mediaInfos} libraryInfo={selectedLibrary} />
       </Box>
     </Box>
   );
@@ -63,52 +97,12 @@ export const HomePage: React.FC = () => {
 const MediaInfoList = ({
   mediaInfos,
   libraryInfo,
-  mediaInfoNeedUpdateCallback,
 }: {
   mediaInfos: Array<MediaInfo>;
   libraryInfo: LibraryInfo | null;
-  mediaInfoNeedUpdateCallback: () => void;
 }) => {
-  const [isScanning, setIsScanning] = React.useState(false);
-  let timerId: NodeJS.Timeout | undefined = undefined;
-  const startScanTask = async () => {
-    if (libraryInfo === null) {
-      return;
-    }
-    const response = await Api.startMediaInfoScan({
-      libraryName: libraryInfo.name,
-    });
-    if (response.status !== 200) {
-      return;
-    }
-    setIsScanning(true);
-    timerId = setInterval(async () => {
-      const response = await Api.getMediaInfoScanStatus(libraryInfo.name);
-      if (response.status !== 200 || (await response.text()) === 'false') {
-        setIsScanning(false);
-        clearInterval(timerId);
-        return;
-      }
-      mediaInfoNeedUpdateCallback();
-    }, 2000);
-    return () => {
-      if (timerId !== undefined) {
-        clearInterval(timerId);
-      }
-    };
-  };
   return (
     <>
-      {libraryInfo !== null && (
-        <Box>
-          <IconButton
-            isLoading={isScanning}
-            aria-label="scan"
-            icon={<MdRefresh />}
-            onClick={() => startScanTask()}
-          ></IconButton>
-        </Box>
-      )}
       <Flex flexWrap={'wrap'} justifyContent={'center'}>
         {mediaInfos.map((mediaInfo, index) => {
           return (

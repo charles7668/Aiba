@@ -15,7 +15,7 @@ namespace Aiba.TaskManager
         {
             ILoggerFactory loggerFactory = Program.ServiceProvider.GetRequiredService<ILoggerFactory>();
             ILogger logger = loggerFactory.CreateLogger("TaskExecutor");
-            logger.LogInformation("Scanning media infos by user {User} , Library : {LibraryName}", userId,
+            logger.LogInformation("Scanning media infos by user {User} , Library : {LibraryName} start", userId,
                 libraryInfo.Name);
             IServiceProvider scope = Program.ServiceProvider.CreateAsyncScope().ServiceProvider;
             ScannerFactory scannerFactory = scope.GetRequiredService<ScannerFactory>();
