@@ -13,6 +13,9 @@ import React, { useEffect, useState } from 'react';
 import { MediaInfo } from '../models/MediaInfo';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Api } from '../services/Api.ts';
+import { UrlHelper } from '../services/UrlHelper.ts';
+
+let isLocalProvider = false;
 
 const mediaInfoGenres: React.FC<{ mediaInfo: MediaInfo }> = ({ mediaInfo }) => {
   return (
@@ -45,6 +48,10 @@ const mediaInfoTags: React.FC<{ mediaInfo: MediaInfo }> = ({ mediaInfo }) => {
 const mediaDetailContent: React.FC<{ mediaInfo: MediaInfo }> = ({
   mediaInfo,
 }) => {
+  let realImageUrl = mediaInfo.url;
+  if (isLocalProvider) {
+    realImageUrl = UrlHelper.ImageUrlConverter(mediaInfo.imageUrl);
+  }
   return (
     <Flex
       maxW="container.xl"
@@ -67,7 +74,7 @@ const mediaDetailContent: React.FC<{ mediaInfo: MediaInfo }> = ({
       </Link>
       <Box display="flex" mb={4} mt={4}>
         <Image
-          src={mediaInfo.imageUrl}
+          src={realImageUrl}
           alt="cover Image"
           boxSize="300px"
           objectFit="cover"
@@ -101,14 +108,18 @@ export const MediaDetailPage = () => {
   const { providerName } = useParams<{ providerName: string }>();
   const [searchParams] = useSearchParams();
   const url = searchParams.get('url');
+  const libraryName = searchParams.get('library');
+  if (providerName?.toLowerCase() === 'local') {
+    isLocalProvider = true;
+  }
 
   useEffect(() => {
     if (providerName !== undefined && url != undefined) {
-      Api.getDetailInfo(providerName, url).then((info) => {
+      Api.getDetailInfo(providerName, url, libraryName).then((info) => {
         setMediaInfo(info);
       });
     }
-  }, [providerName, url]);
+  }, [libraryName, providerName, url]);
 
   return (
     <>{!mediaInfo ? <div>no data</div> : mediaDetailContent({ mediaInfo })}</>

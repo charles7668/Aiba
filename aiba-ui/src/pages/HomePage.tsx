@@ -113,7 +113,10 @@ const MediaInfoList = ({
         {mediaInfos.map((mediaInfo, index) => {
           return (
             <Box key={index} p={4}>
-              <MediaInfoCard mediaInfo={mediaInfo}></MediaInfoCard>
+              <MediaInfoCard
+                mediaInfo={mediaInfo}
+                libraryInfo={libraryInfo}
+              ></MediaInfoCard>
             </Box>
           );
         })}

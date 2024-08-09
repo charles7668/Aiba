@@ -25,16 +25,21 @@ const search = async (params: SearchOption): Promise<MediaInfo[]> => {
 
 const getDetailInfo = async (
   providerName: string,
-  url: string
+  url: string,
+  libraryName: string | null
 ): Promise<MediaInfo> => {
   const encodedProviderName = encodeURIComponent(providerName);
   const encodedUrl = encodeURIComponent(url);
+  const encodedLibraryName = libraryName
+    ? encodeURIComponent(libraryName)
+    : null;
   const response = await fetch(
     baseUrl +
       '/api/MediaInfo/detail/' +
       encodedProviderName +
       '?url=' +
-      encodedUrl,
+      encodedUrl +
+      (encodedLibraryName ? '&library=' + encodedLibraryName : ''),
     {
       method: 'GET',
       credentials: 'include',

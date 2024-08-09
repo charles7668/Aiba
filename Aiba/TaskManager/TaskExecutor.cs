@@ -31,7 +31,7 @@ namespace Aiba.TaskManager
                 try
                 {
                     ConfiguredTaskAwaitable temp = unitOfWork
-                        .AddMediaInfoToLibraryAsync(userId, libraryInfo, mediaInfo)
+                        .AddMediaInfoToLibraryAsync(userId, libraryInfo.Name, mediaInfo)
                         .ConfigureAwait(false);
                     temp.GetAwaiter().GetResult();
                 }

@@ -11,39 +11,58 @@ namespace Aiba.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class MediaInfoController : Controller
+    public class MediaInfoController(
+        MediaProviderFactory mediaProviderFactory,
+        ILogger<MediaInfoController> logger,
+        IUnitOfWork unitOfWork,
+        UserManager<IdentityUser> userManager)
+        : Controller
     {
-        public MediaInfoController(MediaProviderFactory mediaProviderFactory, ILogger<MediaInfoController> logger,
-            IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager)
-        {
-            _mediaProviderFactory = mediaProviderFactory;
-            _logger = logger;
-            _unitOfWord = unitOfWork;
-            _userManager = userManager;
-        }
-
-
-        private readonly ILogger<MediaInfoController> _logger;
-
-        private readonly MediaProviderFactory _mediaProviderFactory;
-        private readonly IUnitOfWork _unitOfWord;
-        private readonly UserManager<IdentityUser> _userManager;
-
         [HttpGet("detail/{providerName}")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None)]
-        public async Task<ActionResult<MediaInfo>> GetDetail(string providerName, [FromQuery] string url)
+        public async Task<ActionResult<MediaInfo>> GetDetail(string providerName, [FromQuery] string url,
+            [FromQuery(Name = "library")] string? libraryName)
         {
             string decodeProviderName = HttpUtility.UrlDecode(providerName);
-            _logger.LogInformation("MediaInfoController.GetDetail called with providerName: {ProviderName}",
+            logger.LogInformation("MediaInfoController.GetDetail called with providerName: {ProviderName}",
                 decodeProviderName);
-            IMediaInfoProvider? provider = _mediaProviderFactory.GetProvider(decodeProviderName);
-            if (provider == null)
+            string decodeUrl = HttpUtility.UrlDecode(url);
+
+            // use local file data
+            if (providerName.ToLower() == "local")
             {
-                _logger.LogError("Provider not found");
-                return BadRequest("Provider not found");
+                string? userId = userManager.GetUserId(User);
+                if (userId == null)
+                {
+                    return Unauthorized();
+                }
+
+                try
+                {
+                    libraryName ??= "";
+                    MediaInfo? mediaInfo = await unitOfWork.GetMediaInfo(userId, libraryName,
+                        decodeUrl.StartsWith("file://") ? decodeUrl : "file://" + decodeUrl);
+                    if (mediaInfo == null)
+                    {
+                        logger.LogWarning("MediaInfo not found");
+                        return NotFound();
+                    }
+
+                    return mediaInfo;
+                }
+                catch (Exception e)
+                {
+                    logger.LogError("GetDetail failed : {Exception}", e.ToString());
+                    return NotFound();
+                }
             }
 
-            string decodeUrl = HttpUtility.UrlDecode(url);
+            IMediaInfoProvider? provider = mediaProviderFactory.GetProvider(decodeProviderName);
+            if (provider == null)
+            {
+                logger.LogError("Provider not found");
+                return BadRequest("Provider not found");
+            }
 
             MediaInfo detailInfo = await provider.GetDetailInfoAsync(decodeUrl, CancellationToken.None);
             return Ok(detailInfo);
@@ -52,8 +71,8 @@ namespace Aiba.Controllers
         [HttpPost]
         public async Task<ActionResult> AddMediaInfoToLibrary(AddMediaInfoRequest request)
         {
-            string? userId = _userManager.GetUserId(User);
-            _logger.LogInformation("MediaInfoController.AddMediaInfoToLibrary called with userId: {UserId}", userId);
+            string? userId = userManager.GetUserId(User);
+            logger.LogInformation("MediaInfoController.AddMediaInfoToLibrary called with userId: {UserId}", userId);
             if (userId == null)
             {
                 return Unauthorized();
@@ -61,11 +80,11 @@ namespace Aiba.Controllers
 
             try
             {
-                await _unitOfWord.AddMediaInfoToLibraryAsync(userId, request.LibraryInfo, request.MediaInfo);
+                await unitOfWork.AddMediaInfoToLibraryAsync(userId, request.LibraryInfo.Name, request.MediaInfo);
             }
             catch (Exception e)
             {
-                _logger.LogError("AddMediaInfoToLibrary failed : {Exception}", e.ToString());
+                logger.LogError("AddMediaInfoToLibrary failed : {Exception}", e.ToString());
                 return BadRequest($"AddMediaInfoToLibrary failed : {e.Message}");
             }
 
@@ -75,8 +94,8 @@ namespace Aiba.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MediaInfo>>> GetMediaInfosFromLibrary([FromQuery] string libraryName)
         {
-            string? userId = _userManager.GetUserId(User);
-            _logger.LogInformation("MediaInfoController.GetMediaInfosFromLibrary called by userId: {UserId}", userId);
+            string? userId = userManager.GetUserId(User);
+            logger.LogInformation("MediaInfoController.GetMediaInfosFromLibrary called by userId: {UserId}", userId);
             if (userId == null)
             {
                 return Unauthorized();
@@ -90,11 +109,11 @@ namespace Aiba.Controllers
             IEnumerable<MediaInfo> mediaInfos;
             try
             {
-                mediaInfos = await _unitOfWord.GetMediaInfosFromLibrary(userId, libraryInfo);
+                mediaInfos = await unitOfWork.GetMediaInfosFromLibraryName(userId, libraryInfo.Name);
             }
             catch (Exception e)
             {
-                _logger.LogError("GetMediaInfosFromLibrary failed : {Exception}", e.ToString());
+                logger.LogError("GetMediaInfosFromLibrary failed : {Exception}", e.ToString());
                 return BadRequest($"GetMediaInfosFromLibrary failed : {e.Message}");
             }
 

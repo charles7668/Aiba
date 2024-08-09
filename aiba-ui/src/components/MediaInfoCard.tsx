@@ -11,12 +11,14 @@ import {
 } from '@chakra-ui/react';
 import React, { ReactNode } from 'react';
 import { MediaInfo } from '../models/MediaInfo.ts';
-import { Api } from '../services/Api.ts';
+import { LibraryInfo } from '../models/LibraryInfo.ts';
+import { UrlHelper } from '../services/UrlHelper.ts';
 
 interface MediaCardProps {
   mx?: string;
   my?: string;
   mediaInfo: MediaInfo;
+  libraryInfo: LibraryInfo | null;
   menuComponents?: ReactNode;
 }
 
@@ -29,13 +31,17 @@ const VerticalDotsIcon = createIcon({
 export const MediaInfoCard: React.FC<MediaCardProps> = ({
   mediaInfo,
   menuComponents,
+  libraryInfo,
   ...props
 }) => {
-  let realImageUrl = mediaInfo.imageUrl;
-  if (realImageUrl.startsWith('file://')) {
-    const replaceFileProtocol = realImageUrl.replace('file://', '');
-    realImageUrl =
-      Api.baseUrl + '/api/Image/' + encodeURIComponent(replaceFileProtocol);
+  const realImageUrl = UrlHelper.ImageUrlConverter(mediaInfo.imageUrl);
+  let detailLink =
+    'detail/' +
+    encodeURIComponent(mediaInfo.providerName) +
+    '?url=' +
+    encodeURIComponent(mediaInfo.url);
+  if (libraryInfo !== null) {
+    detailLink += '&library=' + encodeURIComponent(libraryInfo.name);
   }
   return (
     <Flex
@@ -68,12 +74,7 @@ export const MediaInfoCard: React.FC<MediaCardProps> = ({
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
         }}
-        href={
-          'detail/' +
-          encodeURIComponent(mediaInfo.providerName) +
-          '?url=' +
-          encodeURIComponent(mediaInfo.url)
-        }
+        href={detailLink}
       >
         {mediaInfo.name}
       </Link>

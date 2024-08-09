@@ -9,11 +9,9 @@ namespace Aiba.Repository
         private ILibraryRepository LibraryRepository { get; } = new LibraryRepository(context);
         private IMediaInfoRepository MediaInfoRepository { get; } = new MediaInfoRepository(context);
 
-        public async Task<IEnumerable<MediaInfo>> GetMediaInfosFromLibrary(string userId, LibraryInfo libraryInfo)
+        public async Task<IEnumerable<MediaInfo>> GetMediaInfosFromLibraryName(string userId, string libraryName)
         {
-            var libraryEntity = new LibraryEntity();
-            LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
-            libraryEntity = await LibraryRepository.GetLibraryEntitiesByUserIdAndNameAsync(userId, libraryEntity);
+            LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
             if (libraryEntity == null)
                 throw new ArgumentException("library not found");
             IEnumerable<MediaInfoEntity> mediaEntities =
@@ -27,6 +25,19 @@ namespace Aiba.Repository
             }
 
             return result;
+        }
+
+        public async Task<MediaInfo?> GetMediaInfo(string userId, string libraryName, string imagePath)
+        {
+            LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
+            if (libraryEntity == null)
+                return null;
+            MediaInfoEntity? mediaInfoEntity = await MediaInfoRepository.GetMediaInfo(libraryEntity.Id, imagePath);
+            if (mediaInfoEntity == null)
+                return null;
+            var mediaInfo = new MediaInfo();
+            MediaInfoEntityMapping.Map(mediaInfoEntity, mediaInfo);
+            return mediaInfo;
         }
 
         public async Task AddLibraryInfoByUserIdAsync(string userId, LibraryInfo libraryInfo)
@@ -57,11 +68,9 @@ namespace Aiba.Repository
             await context.SaveChangesAsync();
         }
 
-        public async Task AddMediaInfoToLibraryAsync(string userId, LibraryInfo libraryInfo, MediaInfo mediaInfo)
+        public async Task AddMediaInfoToLibraryAsync(string userId, string libraryName, MediaInfo mediaInfo)
         {
-            var libraryEntity = new LibraryEntity();
-            LibraryEntityMapping.MapFrom(libraryEntity, libraryInfo);
-            libraryEntity = await LibraryRepository.GetLibraryEntitiesByUserIdAndNameAsync(userId, libraryEntity);
+            LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
             if (libraryEntity == null)
                 throw new ArgumentException("library not found");
             var mediaEntity = new MediaInfoEntity();
@@ -72,14 +81,9 @@ namespace Aiba.Repository
             await context.SaveChangesAsync();
         }
 
-        public async Task<LibraryInfo> GetLibraryInfoByUserIdAndNameAsync(string userId, string name)
+        public async Task<LibraryInfo?> GetLibraryInfo(string userId, string libraryName)
         {
-            var libraryEntity = new LibraryEntity
-            {
-                UserId = userId,
-                Name = name
-            };
-            libraryEntity = await LibraryRepository.GetLibraryEntitiesByUserIdAndNameAsync(userId, libraryEntity);
+            LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
             if (libraryEntity == null)
                 throw new ArgumentException("library not found");
             var libraryInfo = new LibraryInfo();

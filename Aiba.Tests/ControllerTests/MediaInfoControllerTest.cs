@@ -45,8 +45,8 @@ namespace Aiba.Tests.ControllerTests
             mockUserManager.Setup(x => x.GetUserId(It.IsAny<ClaimsPrincipal>()))
                 .Returns((ClaimsPrincipal _) => _fakeIsSignIn ? "test" : null);
             mockUnitOfWork.Setup(x =>
-                    x.AddMediaInfoToLibraryAsync(It.IsAny<string>(), It.IsAny<LibraryInfo>(), It.IsAny<MediaInfo>()))
-                .Callback((string _, LibraryInfo _, MediaInfo _) =>
+                    x.AddMediaInfoToLibraryAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MediaInfo>()))
+                .Callback((string _, string _, MediaInfo _) =>
                 {
                     if (_fakeThrowOnAdd)
                         throw new Exception("test");
