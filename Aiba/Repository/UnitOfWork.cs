@@ -9,13 +9,14 @@ namespace Aiba.Repository
         private ILibraryRepository LibraryRepository { get; } = new LibraryRepository(context);
         private IMediaInfoRepository MediaInfoRepository { get; } = new MediaInfoRepository(context);
 
-        public async Task<IEnumerable<MediaInfo>> GetMediaInfosFromLibraryName(string userId, string libraryName)
+        public async Task<IEnumerable<MediaInfo>> GetMediaInfos(string userId, string libraryName, int page,
+            int countPerPage)
         {
             LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
             if (libraryEntity == null)
                 throw new ArgumentException("library not found");
             IEnumerable<MediaInfoEntity> mediaEntities =
-                await MediaInfoRepository.GetMediaInfosByLibraryAsync(libraryEntity);
+                await MediaInfoRepository.GetMediaInfosByLibraryAsync(libraryEntity, page, countPerPage);
             List<MediaInfo> result = [];
             foreach (MediaInfoEntity mediaEntity in mediaEntities)
             {

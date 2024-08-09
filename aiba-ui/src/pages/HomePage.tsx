@@ -1,5 +1,12 @@
 import React, { createContext, FC, useContext, useEffect } from 'react';
-import { Box, Flex, IconButton, MenuItem, MenuList } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  IconButton,
+  MenuItem,
+  MenuList,
+  VStack,
+} from '@chakra-ui/react';
 import { SideBar } from '../components/SideBar.tsx';
 import { Api } from '../services/Api.ts';
 import { LibraryInfo } from '../models/LibraryInfo.ts';
@@ -7,6 +14,7 @@ import { VscLibrary } from 'react-icons/vsc';
 import { MediaInfo } from '../models/MediaInfo.ts';
 import { MediaInfoCard } from '../components/MediaInfoCard.tsx';
 import { MdRefresh } from 'react-icons/md';
+import { FixedCountPagination } from '../components/Pagination.tsx';
 
 export const HomePage: React.FC = () => {
   const [libraries, setLibraries] = React.useState([]);
@@ -14,10 +22,11 @@ export const HomePage: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] =
     React.useState<LibraryInfo | null>(null);
   const [isScanning, setIsScanning] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState(1);
   let timerId: NodeJS.Timeout | undefined = undefined;
 
-  const updateMediaInfos = async (library: LibraryInfo) => {
-    const response = await Api.getMediaInfosFromLibrary(library);
+  const updateMediaInfos = async (library: LibraryInfo, page = 1) => {
+    const response = await Api.getMediaInfosFromLibrary(library, page);
     if (response.status !== 200) {
       return;
     }
@@ -66,6 +75,9 @@ export const HomePage: React.FC = () => {
             icon: VscLibrary,
             title: library.name,
             to: async () => {
+              if (library.name === selectedLibrary?.name) {
+                return;
+              }
               setSelectedLibrary(library);
               await updateMediaInfos(library);
             },
@@ -73,19 +85,27 @@ export const HomePage: React.FC = () => {
         })
       );
     });
-  }, []);
+  }, [selectedLibrary?.name]);
+  useEffect(() => {
+    if (selectedLibrary === null) {
+      return;
+    }
+    updateMediaInfos(selectedLibrary, currentPage).then(() => {});
+  }, [currentPage, selectedLibrary]);
   return (
     <InformationContext.Provider
       value={{
         mediaInfos,
         libraryInfo: selectedLibrary,
+        currentPage: 1,
         updateMediaInfos: setMediaInfos,
         updateLibraryInfo: setSelectedLibrary,
+        updateCurrentPage: setCurrentPage,
       }}
     >
       <Box display={'flex'} justifyContent={'start'}>
         <SideBar items={libraries}></SideBar>
-        <Box flex={'1'}>
+        <VStack flex={'1'}>
           {selectedLibrary !== null && (
             <Box>
               <IconButton
@@ -97,7 +117,24 @@ export const HomePage: React.FC = () => {
             </Box>
           )}
           <MediaInfoList />
-        </Box>
+          {selectedLibrary && (
+            <FixedCountPagination
+              currentPage={currentPage}
+              maxPage={1}
+              onNextPageClick={() => {
+                if (currentPage < 2) return;
+                setCurrentPage(currentPage + 1);
+              }}
+              onPreviousPageClick={() => {
+                if (currentPage > 0) return;
+                setCurrentPage(currentPage - 1);
+              }}
+              onTargetPageClick={(page) => () => {
+                setCurrentPage(page);
+              }}
+            ></FixedCountPagination>
+          )}
+        </VStack>
       </Box>
     </InformationContext.Provider>
   );
@@ -110,13 +147,16 @@ interface MenuContentProps {
 interface InformationContextProps {
   mediaInfos: Array<MediaInfo>;
   libraryInfo: LibraryInfo | null;
-  updateMediaInfos?: (mediaInfos: Array<MediaInfo>) => void | null;
-  updateLibraryInfo?: (libraryInfo: LibraryInfo) => void | null;
+  updateMediaInfos?: (mediaInfos: Array<MediaInfo>) => void;
+  updateLibraryInfo?: (libraryInfo: LibraryInfo) => void;
+  currentPage: number;
+  updateCurrentPage?: (currentPage: number) => void;
 }
 
 const InformationContext = createContext<InformationContextProps>({
   mediaInfos: [],
   libraryInfo: null,
+  currentPage: 1,
 });
 
 const RemoteMediaInfoMenuContent: FC<MenuContentProps> = (props) => {

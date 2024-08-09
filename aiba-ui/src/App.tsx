@@ -19,9 +19,16 @@ export const ProtectedComponent: React.FC<{ child: React.ReactNode }> = ({
 }) => {
   return (
     <>
-      <TopToolBar />
-      <Box id={'app-view'} maxW={'100vw'} maxH={'100vh'} overflowY={'auto'}>
-        <ProtectedRoute>{child}</ProtectedRoute>
+      <Box
+        display={'flex'}
+        flexDirection={'column'}
+        maxH={'100vh'}
+        overflowY={'auto'}
+      >
+        <TopToolBar />
+        <Box id={'app-view'} maxW={'100vw'} maxH={'100%'}>
+          <ProtectedRoute>{child}</ProtectedRoute>
+        </Box>
       </Box>
     </>
   );

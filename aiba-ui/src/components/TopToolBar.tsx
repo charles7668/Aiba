@@ -71,7 +71,7 @@ export const TopToolBar: React.FC<{ id?: string }> = ({ id = null }) => {
       py={2}
       pos={'sticky'}
       left={0}
-      right={0}
+      top={0}
       zIndex={1000}
     >
       <Flex align="center" p={0}>

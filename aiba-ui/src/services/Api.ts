@@ -154,9 +154,16 @@ const removeMediaInfoFromLibrary = async (request: RemoveMediaInfoRequest) => {
   });
 };
 
-const getMediaInfosFromLibrary = async (libraryInfo: LibraryInfo) => {
+const getMediaInfosFromLibrary = async (
+  libraryInfo: LibraryInfo,
+  page: number = 1
+) => {
   return await fetch(
-    baseUrl + '/api/mediaInfo?libraryName=' + libraryInfo.name,
+    baseUrl +
+      '/api/mediaInfo?libraryName=' +
+      libraryInfo.name +
+      '&page=' +
+      page,
     {
       method: 'GET',
       headers: {

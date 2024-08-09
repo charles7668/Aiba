@@ -18,6 +18,8 @@ namespace Aiba.Controllers
         UserManager<IdentityUser> userManager)
         : Controller
     {
+        private const int ITEMS_PER_PAGE = 20;
+
         [HttpGet("detail/{providerName}")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None)]
         public async Task<ActionResult<MediaInfo>> GetDetail(string providerName, [FromQuery] string url,
@@ -108,8 +110,16 @@ namespace Aiba.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MediaInfo>>> GetMediaInfosFromLibrary([FromQuery] string libraryName)
+        public async Task<ActionResult<IEnumerable<MediaInfo>>> GetMediaInfosFromLibrary([FromQuery] string libraryName,
+            [FromQuery(Name = "page")] string pageString = "")
         {
+            var parseResult = int.TryParse(pageString, out var page);
+            if (!parseResult && string.IsNullOrEmpty(pageString))
+            {
+                logger.LogWarning("Page param is not number, use default value 1");
+                page = 1;
+            }
+
             string? userId = userManager.GetUserId(User);
             logger.LogInformation("MediaInfoController.GetMediaInfosFromLibrary called by userId: {UserId}", userId);
             if (userId == null)
@@ -123,9 +133,10 @@ namespace Aiba.Controllers
             };
 
             IEnumerable<MediaInfo> mediaInfos;
+            logger.LogInformation("Query page {Page} from library {LibraryName}", page, libraryName);
             try
             {
-                mediaInfos = await unitOfWork.GetMediaInfosFromLibraryName(userId, libraryInfo.Name);
+                mediaInfos = await unitOfWork.GetMediaInfos(userId, libraryInfo.Name, page, ITEMS_PER_PAGE);
             }
             catch (Exception e)
             {

@@ -10,10 +10,14 @@ namespace Aiba.Repository
             await context.MediaInfos.AddAsync(mediaInfo);
         }
 
-        public Task<IEnumerable<MediaInfoEntity>> GetMediaInfosByLibraryAsync(LibraryEntity libraryEntity)
+        public Task<IEnumerable<MediaInfoEntity>> GetMediaInfosByLibraryAsync(LibraryEntity libraryEntity,
+            int page,
+            int countPerPage)
         {
-            return Task.FromResult<IEnumerable<MediaInfoEntity>>(
-                context.MediaInfos.Where(x => x.LibraryId == libraryEntity.Id));
+            IQueryable<MediaInfoEntity> result = context.MediaInfos.Where(x => x.LibraryId == libraryEntity.Id)
+                .Skip((page - 1) * countPerPage)
+                .Take(countPerPage);
+            return Task.FromResult<IEnumerable<MediaInfoEntity>>(result);
         }
 
         public async Task<MediaInfoEntity?> GetMediaInfo(int libraryId, string mediaPath)
