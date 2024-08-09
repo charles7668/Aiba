@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import React, { ReactNode } from 'react';
 import { MediaInfo } from '../models/MediaInfo.ts';
+import { Api } from '../services/Api.ts';
 
 interface MediaCardProps {
   mx?: string;
@@ -30,6 +31,12 @@ export const MediaInfoCard: React.FC<MediaCardProps> = ({
   menuComponents,
   ...props
 }) => {
+  let realImageUrl = mediaInfo.imageUrl;
+  if (realImageUrl.startsWith('file://')) {
+    const replaceFileProtocol = realImageUrl.replace('file://', '');
+    realImageUrl =
+      Api.baseUrl + '/api/Image/' + encodeURIComponent(replaceFileProtocol);
+  }
   return (
     <Flex
       flexDirection={'column'}
@@ -43,7 +50,7 @@ export const MediaInfoCard: React.FC<MediaCardProps> = ({
       {...props}
     >
       <Image
-        src={mediaInfo.imageUrl}
+        src={realImageUrl}
         alt={'test'}
         width="100%"
         height={'250px'}

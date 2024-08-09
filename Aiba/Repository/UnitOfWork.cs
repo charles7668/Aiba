@@ -86,5 +86,10 @@ namespace Aiba.Repository
             LibraryEntityMapping.Map(libraryEntity, libraryInfo);
             return libraryInfo;
         }
+
+        public Task<bool> HasMediaInfoByImagePath(string imagePath)
+        {
+            return MediaInfoRepository.HasMediaInfoByImagePath(imagePath);
+        }
     }
 }

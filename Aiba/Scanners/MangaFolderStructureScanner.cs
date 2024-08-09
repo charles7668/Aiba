@@ -6,17 +6,18 @@ namespace Aiba.Scanners
 {
     public class MangaFolderStructureScanner : IScanner
     {
-        public static readonly HashSet<string> SupportImageExtension = new()
+        private static readonly HashSet<string> _SupportImageExtension = new()
         {
             ".jpg",
             ".jpeg",
             ".png",
             ".bmp",
-            ".gif"
+            ".gif",
+            ".webp"
         };
 
-        public MediaTypeFlag SupportedMediaType { get; } = MediaTypeFlag.MANGA;
-        public string Name { get; } = "MangaFolderStructureScanner";
+        public MediaTypeFlag SupportedMediaType => MediaTypeFlag.MANGA;
+        public string Name => "MangaFolderStructureScanner";
 
         public Task<Result> ScanAsync(string libraryRootPath, Func<MediaInfo, Result> callback,
             CancellationToken cancellationToken)
@@ -27,7 +28,7 @@ namespace Aiba.Scanners
             {
                 string path = scanningQueue.Dequeue();
                 string? firstImage = Directory.EnumerateFiles(path)
-                    .FirstOrDefault(x => SupportImageExtension.Contains(Path.GetExtension(x.ToLower())));
+                    .FirstOrDefault(x => _SupportImageExtension.Contains(Path.GetExtension(x.ToLower())));
                 if (firstImage != null)
                 {
                     var mediaInfo = new MediaInfo
@@ -40,33 +41,31 @@ namespace Aiba.Scanners
                     };
                     callback(mediaInfo);
                 }
-                else
-                {
-                    IEnumerable<string> cbzFiles =
-                        Directory.EnumerateFiles(path).Where(x => x.ToLower().EndsWith(".cbz"));
-                    foreach (string cbzFile in cbzFiles)
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                            break;
-                        string cbzFullPath = Path.GetFullPath(cbzFile);
-                        var mediaInfo = new MediaInfo
-                        {
-                            Name = Path.GetFileNameWithoutExtension(cbzFile),
-                            Url = "file://" + cbzFullPath,
-                            ImageUrl = "file://" + cbzFullPath,
-                            ProviderName = "local",
-                            Type = "manga"
-                        };
-                        callback(mediaInfo);
-                    }
 
-                    IEnumerable<string> directories = Directory.EnumerateDirectories(path);
-                    foreach (string directory in directories)
+                IEnumerable<string> cbzFiles =
+                    Directory.EnumerateFiles(path).Where(x => x.ToLower().EndsWith(".cbz"));
+                foreach (string cbzFile in cbzFiles)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+                    string cbzFullPath = Path.GetFullPath(cbzFile);
+                    var mediaInfo = new MediaInfo
                     {
-                        if (cancellationToken.IsCancellationRequested)
-                            break;
-                        scanningQueue.Enqueue(directory);
-                    }
+                        Name = Path.GetFileNameWithoutExtension(cbzFile),
+                        Url = "file://" + cbzFullPath,
+                        ImageUrl = "file://" + cbzFullPath,
+                        ProviderName = "local",
+                        Type = "manga"
+                    };
+                    callback(mediaInfo);
+                }
+
+                IEnumerable<string> directories = Directory.EnumerateDirectories(path);
+                foreach (string directory in directories)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+                    scanningQueue.Enqueue(directory);
                 }
             }
 

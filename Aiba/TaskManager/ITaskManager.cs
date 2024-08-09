@@ -9,5 +9,6 @@ namespace Aiba.TaskManager
         public bool CheckTaskRunning(string taskName);
         public CancellationTokenSource CreateCancellationTokenSource(string taskName);
         public void CancelTask(string taskName);
+        public string GenerateTaskName(string userId, string libraryName);
     }
 }

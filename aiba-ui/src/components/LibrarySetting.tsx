@@ -134,7 +134,7 @@ const LibraryAddInputModal: React.FC<{
   };
 
   useEffect(() => {
-    Api.getScanner(type).then(async (response) => {
+    Api.getScannerList(type).then(async (response) => {
       if (response.status !== 200) {
         return;
       }

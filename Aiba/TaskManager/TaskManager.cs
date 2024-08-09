@@ -1,17 +1,15 @@
-﻿using Aiba.Model;
-using Aiba.Repository;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Storage;
 using Hangfire.Storage.Monitoring;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 
 namespace Aiba.TaskManager
 {
     public class TaskManager(ILogger<TaskManager> logger) : ITaskManager
     {
-        private static readonly Dictionary<string, string?> RunningTasks = new();
-        private static readonly Dictionary<string, CancellationTokenSource> CancellationTokenSources = new();
+        private static readonly ConcurrentDictionary<string, string?> _RunningTasks = new();
+        private static readonly ConcurrentDictionary<string, CancellationTokenSource> _CancellationTokenSources = new();
 
         public void EnqueueTask(string taskName, Expression<Action> task)
         {
@@ -19,12 +17,12 @@ namespace Aiba.TaskManager
                 return;
             string? taskId = BackgroundJob.Enqueue(task);
             logger.LogInformation("Task {TaskName} with id {TaskId} is pending", taskName, taskId);
-            RunningTasks.Add(taskName, taskId);
+            _RunningTasks[taskName] = taskId;
         }
 
         public bool CheckTaskRunning(string taskName)
         {
-            if (!RunningTasks.TryGetValue(taskName, out string? jobId))
+            if (!_RunningTasks.TryGetValue(taskName, out string? jobId))
                 return false;
             IMonitoringApi? monitor = JobStorage.Current.GetMonitoringApi();
             IEnumerable<KeyValuePair<string, ProcessingJobDto>> processingJobs =
@@ -35,23 +33,28 @@ namespace Aiba.TaskManager
                 return true;
             }
 
-            RunningTasks.Remove(taskName);
-            CancellationTokenSources.Remove(taskName);
+            _RunningTasks.Remove(taskName, out _);
+            _CancellationTokenSources.Remove(taskName, out _);
             return false;
         }
 
         public CancellationTokenSource CreateCancellationTokenSource(string taskName)
         {
-            CancellationTokenSources[taskName] = new CancellationTokenSource();
-            return CancellationTokenSources[taskName];
+            _CancellationTokenSources[taskName] = new CancellationTokenSource();
+            return _CancellationTokenSources[taskName];
         }
 
         public void CancelTask(string taskName)
         {
-            if (CancellationTokenSources.TryGetValue(taskName, out CancellationTokenSource? cancellationTokenSource))
+            if (_CancellationTokenSources.TryGetValue(taskName, out CancellationTokenSource? cancellationTokenSource))
             {
                 cancellationTokenSource.Cancel();
             }
+        }
+
+        public string GenerateTaskName(string userId, string libraryName)
+        {
+            return "userId:" + userId + ";library:" + libraryName;
         }
     }
 }

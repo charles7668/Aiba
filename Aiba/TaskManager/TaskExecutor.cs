@@ -13,7 +13,8 @@ namespace Aiba.TaskManager
             string scannerName,
             CancellationToken cancellationToken)
         {
-            ILogger logger = Program.ServiceProvider.GetRequiredService<ILogger>();
+            ILoggerFactory loggerFactory = Program.ServiceProvider.GetRequiredService<ILoggerFactory>();
+            ILogger logger = loggerFactory.CreateLogger("TaskExecutor");
             logger.LogInformation("Scanning media infos by user {User} , Library : {LibraryName}", userId,
                 libraryInfo.Name);
             IServiceProvider scope = Program.ServiceProvider.CreateAsyncScope().ServiceProvider;

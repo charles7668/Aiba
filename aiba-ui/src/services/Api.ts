@@ -149,7 +149,7 @@ const getMediaInfosFromLibrary = async (libraryInfo: LibraryInfo) => {
   );
 };
 
-const getScanner = async (mediaTypeFlagNumber: number) => {
+const getScannerList = async (mediaTypeFlagNumber: number) => {
   return await fetch(
     baseUrl + '/api/Scan/scanner?flagNumber=' + mediaTypeFlagNumber,
     {
@@ -160,6 +160,28 @@ const getScanner = async (mediaTypeFlagNumber: number) => {
       credentials: 'include',
     }
   );
+};
+
+const startMediaInfoScan = async ({ libraryName }: { libraryName: string }) => {
+  return await fetch(baseUrl + '/api/Scan/mediaInfos', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ libraryName }),
+  });
+};
+
+const getMediaInfoScanStatus = async (libraryName: string) => {
+  libraryName = encodeURIComponent(libraryName);
+  return await fetch(baseUrl + '/api/Scan/status?library=' + libraryName, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
 };
 
 export const Api = {
@@ -174,6 +196,8 @@ export const Api = {
   deleteLibrary,
   addMediaInfoToLibrary,
   getMediaInfosFromLibrary,
-  getScanner,
+  getScannerList,
+  getMediaInfoScanStatus,
+  startMediaInfoScan,
   baseUrl,
 };

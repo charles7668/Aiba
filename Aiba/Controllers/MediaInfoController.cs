@@ -34,7 +34,7 @@ namespace Aiba.Controllers
         public async Task<ActionResult<MediaInfo>> GetDetail(string providerName, [FromQuery] string url)
         {
             string decodeProviderName = HttpUtility.UrlDecode(providerName);
-            _logger.LogInformation("MediaInfoController.GetDetail called with providerName: {providerName}",
+            _logger.LogInformation("MediaInfoController.GetDetail called with providerName: {ProviderName}",
                 decodeProviderName);
             IMediaInfoProvider? provider = _mediaProviderFactory.GetProvider(decodeProviderName);
             if (provider == null)
@@ -53,7 +53,7 @@ namespace Aiba.Controllers
         public async Task<ActionResult> AddMediaInfoToLibrary(AddMediaInfoRequest request)
         {
             string? userId = _userManager.GetUserId(User);
-            _logger.LogInformation("MediaInfoController.AddMediaInfoToLibrary called with userId: {userId}", userId);
+            _logger.LogInformation("MediaInfoController.AddMediaInfoToLibrary called with userId: {UserId}", userId);
             if (userId == null)
             {
                 return Unauthorized();
@@ -73,11 +73,10 @@ namespace Aiba.Controllers
         }
 
         [HttpGet]
-        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<IEnumerable<MediaInfo>>> GetMediaInfosFromLibrary([FromQuery] string libraryName)
         {
             string? userId = _userManager.GetUserId(User);
-            _logger.LogInformation("MediaInfoController.GetMediaInfosFromLibrary called by userId: {userId}", userId);
+            _logger.LogInformation("MediaInfoController.GetMediaInfosFromLibrary called by userId: {UserId}", userId);
             if (userId == null)
             {
                 return Unauthorized();

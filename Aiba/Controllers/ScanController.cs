@@ -38,13 +38,24 @@ namespace Aiba.Controllers
                 .Select(x => x.Name)));
         }
 
+        [HttpGet("status")]
+        public Task<ActionResult<bool>> CheckTaskStatus([FromQuery(Name = "library")] string libraryName)
+        {
+            string? userId = _userManager.GetUserId(User);
+            if (userId == null)
+                return Task.FromResult<ActionResult<bool>>(Unauthorized());
+            string taskName = _taskManager.GenerateTaskName(userId, libraryName);
+            bool isRunning = _taskManager.CheckTaskRunning(taskName);
+            return Task.FromResult<ActionResult<bool>>(Ok(isRunning));
+        }
+
         [HttpPost("mediaInfos")]
         public async Task<IActionResult> ScanMediaInfos(ScanMediaInfoRequest request)
         {
             string? userId = _userManager.GetUserId(User);
             if (userId == null)
                 return Unauthorized();
-            _logger.LogInformation("Scanning media infos by user {User} , Librayry : {LibraryName}", userId,
+            _logger.LogInformation("Scanning media infos by user {User} , Library : {LibraryName}", userId,
                 request.LibraryName);
             LibraryInfo libraryInfo = await _unitOfWork.GetLibraryInfoByUserIdAndNameAsync(userId, request.LibraryName);
             string scannerName = libraryInfo.ScannerName;
@@ -55,7 +66,9 @@ namespace Aiba.Controllers
                 return BadRequest("Scanner not found");
             }
 
-            string taskName = userId + libraryInfo.Name;
+            string taskName = _taskManager.GenerateTaskName(userId, libraryInfo.Name);
+            if (_taskManager.CheckTaskRunning(taskName))
+                return Ok();
             CancellationTokenSource cancellationTokenSource = _taskManager.CreateCancellationTokenSource(taskName);
 
             _taskManager.EnqueueTask(taskName,

@@ -7,5 +7,7 @@ namespace Aiba.Repository
         public Task AddMediaInfo(MediaInfoEntity mediaInfo);
 
         public Task<IEnumerable<MediaInfoEntity>> GetMediaInfosByLibraryAsync(LibraryEntity libraryEntity);
+
+        public Task<bool> HasMediaInfoByImagePath(string imagePath);
     }
 }

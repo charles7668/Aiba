@@ -14,5 +14,10 @@ namespace Aiba.Repository
             return Task.FromResult<IEnumerable<MediaInfoEntity>>(
                 context.MediaInfos.Where(x => x.LibraryId == libraryEntity.Id));
         }
+
+        public Task<bool> HasMediaInfoByImagePath(string imagePath)
+        {
+            return Task.FromResult(context.MediaInfos.Any(x => x.ImageUrl == imagePath));
+        }
     }
 }
