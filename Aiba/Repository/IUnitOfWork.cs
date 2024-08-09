@@ -12,5 +12,6 @@ namespace Aiba.Repository
         public Task AddMediaInfoToLibraryAsync(string userId, string libraryName, MediaInfo mediaInfo);
         public Task<LibraryInfo?> GetLibraryInfo(string userId, string libraryName);
         public Task<bool> HasMediaInfoByImagePath(string imagePath);
+        public Task RemoveMediaInfo(string userId, string libraryName, MediaInfo mediaInfo);
     }
 }

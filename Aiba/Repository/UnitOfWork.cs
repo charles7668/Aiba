@@ -98,5 +98,19 @@ namespace Aiba.Repository
         {
             return MediaInfoRepository.HasMediaInfoByImagePath(imagePath);
         }
+
+        public async Task RemoveMediaInfo(string userId, string libraryName, MediaInfo mediaInfo)
+        {
+            var mediaEntity = new MediaInfoEntity();
+            MediaInfoEntityMapping.MapFrom(mediaEntity, mediaInfo);
+            var libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
+            if (libraryEntity == null)
+                return;
+            mediaEntity = await MediaInfoRepository.GetMediaInfo(libraryEntity.Id, mediaEntity.Url);
+            if (mediaEntity == null)
+                return;
+            await MediaInfoRepository.Remove(userId, mediaEntity);
+            await context.SaveChangesAsync();
+        }
     }
 }

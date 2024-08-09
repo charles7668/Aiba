@@ -91,6 +91,22 @@ namespace Aiba.Controllers
             return Ok();
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> RemoveMediaInfoFromLibrary(RemoveMediaInfoRequest request)
+        {
+            string? userId = userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            logger.LogInformation("MediaInfoController.RemoveMediaInfoFromLibrary called with userId: {UserId}",
+                userId);
+
+            await unitOfWork.RemoveMediaInfo(userId, request.LibraryInfo.Name, request.MediaInfo);
+            return Ok();
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MediaInfo>>> GetMediaInfosFromLibrary([FromQuery] string libraryName)
         {

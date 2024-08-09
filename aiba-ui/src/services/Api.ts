@@ -2,6 +2,7 @@ import { SearchOption } from '../models/SearchOption.ts';
 import { MediaInfo } from '../models/MediaInfo.ts';
 import { RegisterInfo } from '../models/RegisterInfo.ts';
 import { LibraryInfo } from '../models/LibraryInfo.ts';
+import { RemoveMediaInfoRequest } from '../models/RemoveMediaInfoRequest.ts';
 
 const baseUrl = import.meta.env.VITE_API_BASEURL || '';
 
@@ -141,6 +142,18 @@ const addMediaInfoToLibrary = async (
     body: JSON.stringify({ mediaInfo, libraryInfo }),
   });
 };
+
+const removeMediaInfoFromLibrary = async (request: RemoveMediaInfoRequest) => {
+  return await fetch(baseUrl + '/api/mediaInfo', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(request),
+  });
+};
+
 const getMediaInfosFromLibrary = async (libraryInfo: LibraryInfo) => {
   return await fetch(
     baseUrl + '/api/mediaInfo?libraryName=' + libraryInfo.name,
@@ -200,6 +213,7 @@ export const Api = {
   addLibrary,
   deleteLibrary,
   addMediaInfoToLibrary,
+  removeMediaInfoFromLibrary,
   getMediaInfosFromLibrary,
   getScannerList,
   getMediaInfoScanStatus,

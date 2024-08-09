@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Box, Flex, IconButton } from '@chakra-ui/react';
+import React, { createContext, FC, useContext, useEffect } from 'react';
+import { Box, Flex, IconButton, MenuItem, MenuList } from '@chakra-ui/react';
 import { SideBar } from '../components/SideBar.tsx';
 import { Api } from '../services/Api.ts';
 import { LibraryInfo } from '../models/LibraryInfo.ts';
@@ -75,40 +75,118 @@ export const HomePage: React.FC = () => {
     });
   }, []);
   return (
-    <Box display={'flex'} justifyContent={'start'}>
-      <SideBar items={libraries}></SideBar>
-      <Box flex={'1'}>
-        {selectedLibrary !== null && (
-          <Box>
-            <IconButton
-              isLoading={isScanning}
-              aria-label="scan"
-              icon={<MdRefresh />}
-              onClick={() => startScanTask()}
-            ></IconButton>
-          </Box>
-        )}
-        <MediaInfoList mediaInfos={mediaInfos} libraryInfo={selectedLibrary} />
+    <InformationContext.Provider
+      value={{
+        mediaInfos,
+        libraryInfo: selectedLibrary,
+        updateMediaInfos: setMediaInfos,
+        updateLibraryInfo: setSelectedLibrary,
+      }}
+    >
+      <Box display={'flex'} justifyContent={'start'}>
+        <SideBar items={libraries}></SideBar>
+        <Box flex={'1'}>
+          {selectedLibrary !== null && (
+            <Box>
+              <IconButton
+                isLoading={isScanning}
+                aria-label="scan"
+                icon={<MdRefresh />}
+                onClick={() => startScanTask()}
+              ></IconButton>
+            </Box>
+          )}
+          <MediaInfoList />
+        </Box>
       </Box>
-    </Box>
+    </InformationContext.Provider>
   );
 };
 
-const MediaInfoList = ({
-  mediaInfos,
-  libraryInfo,
-}: {
+interface MenuContentProps {
+  mediaInfo: MediaInfo;
+}
+
+interface InformationContextProps {
   mediaInfos: Array<MediaInfo>;
   libraryInfo: LibraryInfo | null;
-}) => {
+  updateMediaInfos?: (mediaInfos: Array<MediaInfo>) => void | null;
+  updateLibraryInfo?: (libraryInfo: LibraryInfo) => void | null;
+}
+
+const InformationContext = createContext<InformationContextProps>({
+  mediaInfos: [],
+  libraryInfo: null,
+});
+
+const RemoteMediaInfoMenuContent: FC<MenuContentProps> = (props) => {
+  const { mediaInfo } = props;
+  const { mediaInfos, libraryInfo, updateMediaInfos } =
+    useContext(InformationContext);
+  const removeMediaInfo = async () => {
+    if (libraryInfo === null) {
+      return;
+    }
+    const response = await Api.removeMediaInfoFromLibrary({
+      mediaInfo,
+      libraryInfo,
+    });
+    if (response.status !== 200) {
+      return;
+    }
+    if (updateMediaInfos)
+      updateMediaInfos(mediaInfos.filter((m) => m !== mediaInfo));
+  };
+  return (
+    <MenuList>
+      <MenuItem onClick={removeMediaInfo}>Remove From Library</MenuItem>
+    </MenuList>
+  );
+};
+const LocalMediaInfoMenuContent: FC<MenuContentProps> = (props) => {
+  const { mediaInfo } = props;
+  const { mediaInfos, libraryInfo, updateMediaInfos } =
+    useContext(InformationContext);
+  const removeMediaInfo = async () => {
+    if (libraryInfo === null) {
+      return;
+    }
+    const response = await Api.removeMediaInfoFromLibrary({
+      mediaInfo,
+      libraryInfo,
+    });
+    if (response.status !== 200) {
+      return;
+    }
+    if (updateMediaInfos)
+      updateMediaInfos(mediaInfos.filter((m) => m !== mediaInfo));
+  };
+  return (
+    <MenuList>
+      <MenuItem onClick={removeMediaInfo}>Remove From Library</MenuItem>
+    </MenuList>
+  );
+};
+
+const MediaInfoList = () => {
+  const { mediaInfos, libraryInfo } = useContext(InformationContext);
   return (
     <>
       <Flex flexWrap={'wrap'} justifyContent={'center'}>
         {mediaInfos.map((mediaInfo, index) => {
+          const isLocalProvider =
+            mediaInfo.providerName.toLowerCase() === 'local';
           return (
             <Box key={index} p={4}>
               <MediaInfoCard
                 mediaInfo={mediaInfo}
+                menuComponents={
+                  isLocalProvider ? (
+                    <LocalMediaInfoMenuContent mediaInfo={mediaInfo} />
+                  ) : (
+                    <RemoteMediaInfoMenuContent mediaInfo={mediaInfo} />
+                  )
+                }
                 libraryInfo={libraryInfo}
               ></MediaInfoCard>
             </Box>

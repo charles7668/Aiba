@@ -16,16 +16,22 @@ namespace Aiba.Repository
                 context.MediaInfos.Where(x => x.LibraryId == libraryEntity.Id));
         }
 
-        public Task<MediaInfoEntity?> GetMediaInfo(int libraryId, string mediaPath)
+        public async Task<MediaInfoEntity?> GetMediaInfo(int libraryId, string mediaPath)
         {
-            Task<MediaInfoEntity?> mediaInfoEntity =
-                context.MediaInfos.FirstOrDefaultAsync(x => x.LibraryId == libraryId && x.Url == mediaPath);
+            MediaInfoEntity? mediaInfoEntity =
+                await context.MediaInfos.FirstOrDefaultAsync(x => x.LibraryId == libraryId && x.Url == mediaPath);
             return mediaInfoEntity;
         }
 
         public Task<bool> HasMediaInfoByImagePath(string imagePath)
         {
             return Task.FromResult(context.MediaInfos.Any(x => x.ImageUrl == imagePath));
+        }
+
+        public Task Remove(string userId, MediaInfoEntity entity)
+        {
+            context.MediaInfos.Remove(entity);
+            return Task.CompletedTask;
         }
     }
 }
