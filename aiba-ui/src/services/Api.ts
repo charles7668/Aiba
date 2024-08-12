@@ -3,6 +3,7 @@ import { MediaInfo } from '../models/MediaInfo.ts';
 import { RegisterInfo } from '../models/RegisterInfo.ts';
 import { LibraryInfo } from '../models/LibraryInfo.ts';
 import { RemoveMediaInfoRequest } from '../models/RemoveMediaInfoRequest.ts';
+import { UserSetting } from '../models/UserSetting.ts';
 
 const baseUrl = import.meta.env.VITE_API_BASEURL || '';
 
@@ -209,6 +210,27 @@ const getMediaInfoScanStatus = async (libraryName: string) => {
   });
 };
 
+const getUserSetting = async () => {
+  return await fetch(baseUrl + '/api/Setting', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+};
+
+const updateUserSetting = async (userSettings: UserSetting) => {
+  return await fetch(baseUrl + '/api/Setting', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(userSettings),
+  });
+};
+
 export const Api = {
   search,
   getDetailInfo,
@@ -225,5 +247,7 @@ export const Api = {
   getScannerList,
   getMediaInfoScanStatus,
   startMediaInfoScan,
+  getUserSetting,
+  updateUserSetting,
   baseUrl,
 };

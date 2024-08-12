@@ -1,9 +1,9 @@
 import {
+  Avatar,
   Box,
   Divider,
   Flex,
   Heading,
-  Icon,
   IconButton,
   Menu,
   MenuButton,
@@ -13,10 +13,10 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import React, { useEffect } from 'react';
-import { MdAccountCircle } from 'react-icons/md';
 import { Api } from '../services/Api.ts';
 import { useAuth, AuthContextType } from '../modules/useAuth.ts';
 import { useNavigate, Link, NavigateFunction } from 'react-router-dom';
+import { useUserSetting } from '../modules/useUserSetting.ts';
 
 const getUserIconMenuItems = (
   authContext: AuthContextType,
@@ -54,6 +54,7 @@ export const TopToolBar: React.FC<{ id?: string }> = ({ id = null }) => {
   const { isLoggedIn, login, logout } = useAuth();
   const [loginStatus, setLoginStatus] = React.useState(false);
   const navigate = useNavigate();
+  const { userSetting } = useUserSetting();
   useEffect(() => {
     if (isLoggedIn) {
       setLoginStatus(true);
@@ -93,7 +94,7 @@ export const TopToolBar: React.FC<{ id?: string }> = ({ id = null }) => {
           <MenuButton
             as={IconButton}
             isRound={true}
-            icon={<Icon as={MdAccountCircle} />}
+            icon={<Avatar src={userSetting?.coverImage || undefined} />}
             fontSize="40px"
             aria-label={'account'}
           />

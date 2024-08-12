@@ -1,17 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Avatar,
   Box,
+  Button,
   Flex,
   Heading,
   IconButton,
   useToast,
 } from '@chakra-ui/react';
 import { FaCamera } from 'react-icons/fa6';
+import { Api } from '../services/Api.ts';
+import { UserSetting } from '../models/UserSetting.ts';
+import { useUserSetting } from '../modules/useUserSetting.ts';
 
 export const ProfileSetting: React.FC = () => {
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const toast = useToast();
+  const { userSetting, setUserSetting } = useUserSetting();
+
+  const updateSettings = async () => {
+    const setting: UserSetting = {
+      coverImage: avatar === undefined ? '' : avatar,
+    };
+    const response = await Api.updateUserSetting(setting);
+    if (response.status !== 200) {
+      toast({
+        title: 'Failed to update settings status code : ' + response.status,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    setUserSetting(setting);
+    toast({
+      title: 'Settings updated successfully!',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+  };
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,6 +57,11 @@ export const ProfileSetting: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  useEffect(() => {
+    setAvatar(userSetting?.coverImage || undefined);
+  }, [userSetting]);
+
   return (
     <>
       <Box display={'flex'}>
@@ -55,7 +88,11 @@ export const ProfileSetting: React.FC = () => {
               </label>
             </Box>
           </Flex>
-          <Flex></Flex>
+          <Flex justifyContent={'center'}>
+            <Button colorScheme={'blue'} onClick={updateSettings}>
+              Update
+            </Button>
+          </Flex>
         </Box>
       </Box>
     </>

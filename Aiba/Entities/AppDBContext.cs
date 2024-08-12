@@ -10,6 +10,8 @@ namespace Aiba.Entities
         {
         }
 
+        public DbSet<UserSettingEntity> UserSettings { get; set; }
+
         public DbSet<LibraryEntity> Libraries { get; set; }
 
         public DbSet<MediaInfoEntity> MediaInfos { get; set; }

@@ -8,6 +8,7 @@ namespace Aiba.Repository
     {
         private ILibraryRepository LibraryRepository { get; } = new LibraryRepository(context);
         private IMediaInfoRepository MediaInfoRepository { get; } = new MediaInfoRepository(context);
+        private IUserSettingRepository UserSettingRepository { get; } = new UserSettingRepository(context);
 
         public async Task<IEnumerable<MediaInfo>> GetMediaInfos(string userId, string libraryName, int page,
             int countPerPage)
@@ -104,13 +105,45 @@ namespace Aiba.Repository
         {
             var mediaEntity = new MediaInfoEntity();
             MediaInfoEntityMapping.MapFrom(mediaEntity, mediaInfo);
-            var libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
+            LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
             if (libraryEntity == null)
                 return;
             mediaEntity = await MediaInfoRepository.GetMediaInfo(libraryEntity.Id, mediaEntity.Url);
             if (mediaEntity == null)
                 return;
             await MediaInfoRepository.Remove(userId, mediaEntity);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<UserSetting> GetUserSettingAsync(string userId)
+        {
+            UserSettingEntity? userSettingEntity = await UserSettingRepository.GetAsync(userId);
+            if (userSettingEntity == null)
+            {
+                userSettingEntity = new UserSettingEntity
+                {
+                    UserId = userId
+                };
+                await UserSettingRepository.UpdateAsync(userSettingEntity);
+            }
+
+            var result = new UserSetting();
+            UserSettingEntityMapping.Map(userSettingEntity, result);
+            return result;
+        }
+
+        public async Task UpdateUserSettingAsync(string userId, UserSetting userSetting)
+        {
+            UserSettingEntity? userSettingEntity = await UserSettingRepository.GetAsync(userId);
+            if (userSettingEntity == null)
+            {
+                userSettingEntity = new UserSettingEntity();
+            }
+
+            UserSettingEntityMapping.MapFrom(userSettingEntity, userSetting);
+            userSettingEntity.UserId = userId;
+
+            await UserSettingRepository.UpdateAsync(userSettingEntity);
             await context.SaveChangesAsync();
         }
     }
