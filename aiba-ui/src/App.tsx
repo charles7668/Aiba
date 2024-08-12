@@ -41,6 +41,10 @@ const router = createBrowserRouter([
     element: <ProtectedComponent child={<HomePage />}></ProtectedComponent>,
   },
   {
+    path: '/collection/:libraryName',
+    element: <ProtectedComponent child={<HomePage />}></ProtectedComponent>,
+  },
+  {
     path: '/detail/:providerName',
     element: (
       <ProtectedComponent child={<MediaDetailPage />}></ProtectedComponent>

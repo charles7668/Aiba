@@ -5,6 +5,7 @@ import {
   IconButton,
   MenuItem,
   MenuList,
+  Spinner,
   VStack,
 } from '@chakra-ui/react';
 import { SideBar } from '../components/SideBar.tsx';
@@ -15,6 +16,7 @@ import { MediaInfo } from '../models/MediaInfo.ts';
 import { MediaInfoCard } from '../components/MediaInfoCard.tsx';
 import { MdRefresh } from 'react-icons/md';
 import { FixedCountPagination } from '../components/Pagination.tsx';
+import { useParams } from 'react-router-dom';
 
 export const HomePage: React.FC = () => {
   const [libraries, setLibraries] = React.useState([]);
@@ -23,6 +25,8 @@ export const HomePage: React.FC = () => {
     React.useState<LibraryInfo | null>(null);
   const [isScanning, setIsScanning] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const { libraryName: initLibraryName } = useParams<{ libraryName: string }>();
+  const [isLoading, setIsLoading] = React.useState(true);
   let timerId: NodeJS.Timeout | undefined = undefined;
 
   const updateMediaInfos = async (library: LibraryInfo, page = 1) => {
@@ -74,23 +78,29 @@ export const HomePage: React.FC = () => {
           return {
             icon: VscLibrary,
             title: library.name,
-            to: async () => {
-              if (library.name === selectedLibrary?.name) {
-                return;
-              }
-              setSelectedLibrary(library);
-              await updateMediaInfos(library);
-            },
+            to: '/collection/' + encodeURIComponent(library.name),
           };
         })
       );
+      const targetLibraryName = initLibraryName
+        ? decodeURIComponent(initLibraryName)
+        : undefined;
+      if (targetLibraryName === undefined) return;
+      const targetLibrary = libraries.find((l: LibraryInfo) => {
+        return l.name === targetLibraryName;
+      });
+      if (targetLibrary !== undefined) {
+        setSelectedLibrary(targetLibrary);
+      }
     });
-  }, [selectedLibrary?.name]);
+  }, [initLibraryName, selectedLibrary?.name]);
   useEffect(() => {
     if (selectedLibrary === null) {
       return;
     }
-    updateMediaInfos(selectedLibrary, currentPage).then(() => {});
+    updateMediaInfos(selectedLibrary, currentPage).then(() => {
+      setIsLoading(false);
+    });
   }, [currentPage, selectedLibrary]);
   return (
     <InformationContext.Provider
@@ -105,36 +115,49 @@ export const HomePage: React.FC = () => {
     >
       <Box display={'flex'} justifyContent={'start'}>
         <SideBar items={libraries}></SideBar>
-        <VStack flex={'1'}>
-          {selectedLibrary !== null && (
-            <Box>
-              <IconButton
-                isLoading={isScanning}
-                aria-label="scan"
-                icon={<MdRefresh />}
-                onClick={() => startScanTask()}
-              ></IconButton>
-            </Box>
-          )}
-          <MediaInfoList />
-          {selectedLibrary && (
-            <FixedCountPagination
-              currentPage={currentPage}
-              maxPage={1}
-              onNextPageClick={() => {
-                if (currentPage < 2) return;
-                setCurrentPage(currentPage + 1);
-              }}
-              onPreviousPageClick={() => {
-                if (currentPage > 0) return;
-                setCurrentPage(currentPage - 1);
-              }}
-              onTargetPageClick={(page) => () => {
-                setCurrentPage(page);
-              }}
-            ></FixedCountPagination>
-          )}
-        </VStack>
+        {isLoading && initLibraryName !== undefined && (
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            height="100%"
+            width="100%"
+          >
+            <Spinner size="xl" />
+          </Box>
+        )}
+        {!isLoading && (
+          <VStack flex={'1'}>
+            {selectedLibrary !== null && (
+              <Box>
+                <IconButton
+                  isLoading={isScanning}
+                  aria-label="scan"
+                  icon={<MdRefresh />}
+                  onClick={() => startScanTask()}
+                ></IconButton>
+              </Box>
+            )}
+            <MediaInfoList />
+            {selectedLibrary && (
+              <FixedCountPagination
+                currentPage={currentPage}
+                maxPage={1}
+                onNextPageClick={() => {
+                  if (currentPage < 2) return;
+                  setCurrentPage(currentPage + 1);
+                }}
+                onPreviousPageClick={() => {
+                  if (currentPage > 0) return;
+                  setCurrentPage(currentPage - 1);
+                }}
+                onTargetPageClick={(page) => () => {
+                  setCurrentPage(page);
+                }}
+              ></FixedCountPagination>
+            )}
+          </VStack>
+        )}
       </Box>
     </InformationContext.Provider>
   );
