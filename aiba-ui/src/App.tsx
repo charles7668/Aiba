@@ -62,6 +62,10 @@ const router = createBrowserRouter([
     element: <ProtectedComponent child={<SettingsPage />}></ProtectedComponent>,
     children: [
       {
+        index: true,
+        element: <ProfileSetting />,
+      },
+      {
         path: 'profile',
         element: <ProfileSetting />,
       },

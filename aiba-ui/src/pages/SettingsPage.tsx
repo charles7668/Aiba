@@ -14,6 +14,7 @@ import {
 import { Outlet } from 'react-router-dom';
 import { SideBar } from '../components/SideBar.tsx';
 import { VscLibrary } from 'react-icons/vsc';
+import { MdAccountCircle } from 'react-icons/md';
 
 export const ProfileSetting: React.FC = () => {
   return (
@@ -88,6 +89,11 @@ export const ProfileSetting: React.FC = () => {
 
 export const SettingsPage: React.FC = () => {
   const sideBarItems = [
+    {
+      icon: MdAccountCircle,
+      title: 'Profile',
+      to: '/settings/profile',
+    },
     {
       icon: VscLibrary,
       title: 'Library',

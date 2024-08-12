@@ -25,7 +25,6 @@ const getUserIconMenuItems = (
   if (authContext.isLoggedIn) {
     return (
       <>
-        <MenuItem>Profile</MenuItem>
         <MenuItem onClick={() => navigate('/settings')}>Settings</MenuItem>
         <Divider />
         <MenuItem
