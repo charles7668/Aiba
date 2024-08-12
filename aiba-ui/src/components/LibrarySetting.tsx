@@ -269,7 +269,6 @@ export const LibrarySetting: React.FC = () => {
       borderRadius="lg"
       overflow="hidden"
       p={4}
-      bg="white"
       boxShadow="md"
       display={'flex'}
       justifyContent={'start'}
