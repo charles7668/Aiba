@@ -59,7 +59,9 @@ const LibraryList: React.FC<{
             alignItems={'center'}
             justifyContent={'start'}
           >
-            <Text as="span">{library.name}</Text>
+            <Text as="span" mr={5}>
+              {library.name}
+            </Text>
             <IconButton
               icon={<FaPen />}
               aria-label={'edit'}

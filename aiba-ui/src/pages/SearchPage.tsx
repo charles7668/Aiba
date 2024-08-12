@@ -3,6 +3,7 @@ import { SearchBar } from '../components/SearchBar.tsx';
 import {
   Box,
   Flex,
+  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -32,6 +33,7 @@ const MenuComponents: FC<{
     <MenuList p={0} m={0} width={'100%'}>
       {libraries.length > 0 && (
         <MenuItem
+          as={Box}
           pr={0}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -42,6 +44,7 @@ const MenuComponents: FC<{
             offset={[0, 0]}
           >
             <MenuButton
+              as={IconButton}
               w="full"
               borderRadius="none"
               border={'none'}
@@ -114,6 +117,7 @@ const renderMediaCards = ({
         key={i}
         mx={'5px'}
         my={'5px'}
+        libraryInfo={null}
       />
     );
   }

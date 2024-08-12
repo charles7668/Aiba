@@ -1,7 +1,7 @@
 import { Api } from './Api.ts';
 
 /*
-  handle local image url
+  if the url is a local file path, convert it to a url that can be accessed by the server
  */
 const LocalImageUrlConverter = (url: string) => {
   if (url.startsWith('file://')) {
@@ -10,7 +10,7 @@ const LocalImageUrlConverter = (url: string) => {
       Api.baseUrl + '/api/Image/' + encodeURIComponent(replaceFileProtocol)
     );
   }
-  return Api.baseUrl + '/api/Image/' + encodeURIComponent(url);
+  return url;
 };
 
 export const UrlHelper = {
