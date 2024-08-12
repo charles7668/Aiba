@@ -7,12 +7,13 @@ import { RegisterPage } from './pages/RegisterPage.tsx';
 import { HomePage } from './pages/HomePage.tsx';
 import { SearchPage } from './pages/SearchPage.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
-import { ProfileSetting, SettingsPage } from './pages/SettingsPage.tsx';
+import { SettingsPage } from './pages/SettingsPage.tsx';
 import { useAuth } from './modules/useAuth.ts';
 import React, { useEffect } from 'react';
 import { Api } from './services/Api.ts';
 import { TopToolBar } from './components/TopToolBar.tsx';
 import { LibrarySetting } from './components/LibrarySetting.tsx';
+import { ProfileSetting } from './components/ProfileSetting.tsx';
 
 export const ProtectedComponent: React.FC<{ child: React.ReactNode }> = ({
   child,

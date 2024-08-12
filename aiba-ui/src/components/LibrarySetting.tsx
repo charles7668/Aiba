@@ -263,46 +263,37 @@ export const LibrarySetting: React.FC = () => {
   }, []);
 
   return (
-    <Box
-      maxW="100%"
-      borderWidth="1px"
-      borderRadius="lg"
-      overflow="hidden"
-      p={4}
-      boxShadow="md"
-      display={'flex'}
-      justifyContent={'start'}
-      flexDirection={'column'}
-      alignItems={'start'}
-    >
-      <HStack
-        alignItems={'center'}
-        justifyContent={'center'}
-        justifyItems={'center'}
-        mb={4}
-      >
-        <Heading as="h2" size="lg" mr={4}>
-          Libraries
-        </Heading>
-        <IconButton
-          icon={<MdAdd />}
-          aria-label="Add Library"
-          onClick={() => onOpen()}
-        />
-        <LibraryAddInputModal
-          isOpen={isOpen}
-          onClose={onClose}
-          onSubmit={onSubmit}
-        ></LibraryAddInputModal>
-      </HStack>
-      <List spacing={3} width={'100%'}>
-        {
-          <LibraryList
-            libraries={libraries}
-            onRemoveLibrary={onRemoveLibrary}
+    <Box display={'flex'}>
+      <Box mx={'auto'} p={6} minW={'500px'}>
+        <HStack
+          alignItems={'center'}
+          justifyContent={'start'}
+          justifyItems={'center'}
+          mb={4}
+        >
+          <Heading as="h2" size="lg" mr={4}>
+            Libraries
+          </Heading>
+          <IconButton
+            icon={<MdAdd />}
+            aria-label="Add Library"
+            onClick={() => onOpen()}
           />
-        }
-      </List>
+          <LibraryAddInputModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+          ></LibraryAddInputModal>
+        </HStack>
+        <List spacing={3} width={'100%'}>
+          {
+            <LibraryList
+              libraries={libraries}
+              onRemoveLibrary={onRemoveLibrary}
+            />
+          }
+        </List>
+      </Box>
     </Box>
   );
 };
