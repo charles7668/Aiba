@@ -121,23 +121,26 @@ namespace Aiba.Tests
             Assert.AreEqual(mediaInfoEntity.ProviderName, mediaInfo.ProviderName);
             Assert.AreEqual(mediaInfoEntity.ProviderUrl, mediaInfo.ProviderUrl);
 
-            Assert.AreEqual(mediaInfoEntity.Genres.Length, mediaInfo.Genres.Length);
-            for (int i = 0; i < mediaInfoEntity.Genres.Length; i++)
+            Assert.AreEqual(mediaInfoEntity.Genres.Count, mediaInfo.Genres.Length);
+            var genreList = mediaInfoEntity.Genres.ToList();
+            for (int i = 0; i < mediaInfoEntity.Genres.Count; i++)
             {
-                Assert.AreEqual(mediaInfoEntity.Genres[i].Name, mediaInfo.Genres[i]);
+                Assert.AreEqual(genreList[i].Name, mediaInfo.Genres[i]);
             }
 
-            Assert.AreEqual(mediaInfoEntity.Tags.Length, mediaInfo.Tags.Length);
-            for (int i = 0; i < mediaInfoEntity.Tags.Length; i++)
+            Assert.AreEqual(mediaInfoEntity.Tags.Count, mediaInfo.Tags.Length);
+            var tagList = mediaInfoEntity.Tags.ToList();
+            for (int i = 0; i < mediaInfoEntity.Tags.Count; i++)
             {
-                Assert.AreEqual(mediaInfoEntity.Tags[i].Name, mediaInfo.Tags[i]);
+                Assert.AreEqual(tagList[i].Name, mediaInfo.Tags[i]);
             }
 
-            Assert.AreEqual(mediaInfoEntity.Chapters.Length, mediaInfo.Chapters.Length);
-            for (int i = 0; i < mediaInfoEntity.Chapters.Length; i++)
+            Assert.AreEqual(mediaInfoEntity.Chapters.Count, mediaInfo.Chapters.Length);
+            var chapterList = mediaInfoEntity.Chapters.ToList();
+            for (int i = 0; i < mediaInfoEntity.Chapters.Count; i++)
             {
-                Assert.AreEqual(mediaInfoEntity.Chapters[i].Title, mediaInfo.Chapters[i].ChapterName);
-                Assert.AreEqual(mediaInfoEntity.Chapters[i].Url, mediaInfo.Chapters[i].ChapterUrl);
+                Assert.AreEqual(chapterList[i].Title, mediaInfo.Chapters[i].ChapterName);
+                Assert.AreEqual(chapterList[i].Url, mediaInfo.Chapters[i].ChapterUrl);
             }
 
             // assign new value
@@ -173,23 +176,26 @@ namespace Aiba.Tests
             Assert.AreEqual(mediaInfo.ProviderName, mediaInfoEntity.ProviderName);
             Assert.AreEqual(mediaInfo.ProviderUrl, mediaInfoEntity.ProviderUrl);
 
-            Assert.AreEqual(mediaInfo.Genres.Length, mediaInfoEntity.Genres.Length);
+            Assert.AreEqual(mediaInfo.Genres.Length, mediaInfoEntity.Genres.Count);
+            genreList = mediaInfoEntity.Genres.ToList();
             for (int i = 0; i < mediaInfo.Genres.Length; i++)
             {
-                Assert.AreEqual(mediaInfo.Genres[i], mediaInfoEntity.Genres[i].Name);
+                Assert.AreEqual(mediaInfo.Genres[i], genreList[i].Name);
             }
 
-            Assert.AreEqual(mediaInfo.Tags.Length, mediaInfoEntity.Tags.Length);
+            Assert.AreEqual(mediaInfo.Tags.Length, mediaInfoEntity.Tags.Count);
+            tagList = mediaInfoEntity.Tags.ToList();
             for (int i = 0; i < mediaInfo.Tags.Length; i++)
             {
-                Assert.AreEqual(mediaInfo.Tags[i], mediaInfoEntity.Tags[i].Name);
+                Assert.AreEqual(mediaInfo.Tags[i], tagList[i].Name);
             }
 
-            Assert.AreEqual(mediaInfo.Chapters.Length, mediaInfoEntity.Chapters.Length);
+            Assert.AreEqual(mediaInfo.Chapters.Length, mediaInfoEntity.Chapters.Count);
+            chapterList = mediaInfoEntity.Chapters.ToList();
             for (int i = 0; i < mediaInfo.Chapters.Length; i++)
             {
-                Assert.AreEqual(mediaInfo.Chapters[i].ChapterName, mediaInfoEntity.Chapters[i].Title);
-                Assert.AreEqual(mediaInfo.Chapters[i].ChapterUrl, mediaInfoEntity.Chapters[i].Url);
+                Assert.AreEqual(mediaInfo.Chapters[i].ChapterName, chapterList[i].Title);
+                Assert.AreEqual(mediaInfo.Chapters[i].ChapterUrl, chapterList[i].Url);
             }
         }
 

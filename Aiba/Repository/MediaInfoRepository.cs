@@ -14,7 +14,8 @@ namespace Aiba.Repository
             int page,
             int countPerPage)
         {
-            IQueryable<MediaInfoEntity> result = context.MediaInfos.Where(x => x.LibraryId == libraryEntity.Id)
+            IQueryable<MediaInfoEntity> result = context.MediaInfos.Include(x => x.Chapters)
+                .Where(x => x.LibraryId == libraryEntity.Id)
                 .Skip((page - 1) * countPerPage)
                 .Take(countPerPage);
             return Task.FromResult<IEnumerable<MediaInfoEntity>>(result);
@@ -23,13 +24,14 @@ namespace Aiba.Repository
         public async Task<MediaInfoEntity?> GetMediaInfo(int libraryId, string mediaPath)
         {
             MediaInfoEntity? mediaInfoEntity =
-                await context.MediaInfos.FirstOrDefaultAsync(x => x.LibraryId == libraryId && x.Url == mediaPath);
+                await context.MediaInfos.Include(x => x.Chapters)
+                    .FirstOrDefaultAsync(x => x.LibraryId == libraryId && x.Url == mediaPath);
             return mediaInfoEntity;
         }
 
-        public Task<bool> HasMediaInfoByImagePath(string imagePath)
+        public Task<bool> HasMediaInfoByImageUrl(string imagePath)
         {
-            return Task.FromResult(context.MediaInfos.Any(x => x.ImageUrl == imagePath));
+            return Task.FromResult(context.MediaInfos.Any(x => x.Url == imagePath));
         }
 
         public Task Remove(string userId, MediaInfoEntity entity)

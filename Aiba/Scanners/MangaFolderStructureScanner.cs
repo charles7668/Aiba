@@ -1,4 +1,5 @@
 ﻿using Aiba.Enums;
+using Aiba.Helpers;
 using Aiba.Model;
 using Aiba.Plugin.Scanner;
 
@@ -6,15 +7,15 @@ namespace Aiba.Scanners
 {
     public class MangaFolderStructureScanner : IScanner
     {
-        private static readonly HashSet<string> _SupportImageExtension = new()
-        {
+        private static readonly HashSet<string> _SupportImageExtension =
+        [
             ".jpg",
             ".jpeg",
             ".png",
             ".bmp",
             ".gif",
             ".webp"
-        };
+        ];
 
         public MediaTypeFlag SupportedMediaType => MediaTypeFlag.MANGA;
         public string Name => "MangaFolderStructureScanner";
@@ -70,6 +71,22 @@ namespace Aiba.Scanners
             }
 
             return Task.FromResult(Result.Success());
+        }
+
+        public Task<IEnumerable<string>> GetMediaListAsync(string libraryRootPath, string mediaUrl,
+            string? charpterName,
+            CancellationToken cancellationToken)
+        {
+            var directoryInfo = new DirectoryInfo(mediaUrl.TrimFileProtocol());
+            if (!directoryInfo.Exists)
+            {
+                return Task.FromResult<IEnumerable<string>>([]);
+            }
+
+            IEnumerable<string> files = directoryInfo.EnumerateFiles()
+                .Where(f => _SupportImageExtension.Contains(f.Extension.ToLower()))
+                .Select(f => f.FullName.ToFileProtocol());
+            return Task.FromResult(files);
         }
     }
 }

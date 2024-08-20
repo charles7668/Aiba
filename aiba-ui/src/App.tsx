@@ -14,6 +14,7 @@ import { Api } from './services/Api.ts';
 import { TopToolBar } from './components/TopToolBar.tsx';
 import { LibrarySetting } from './components/LibrarySetting.tsx';
 import { ProfileSetting } from './components/ProfileSetting.tsx';
+import { MangeReadingPage } from './pages/MangeReadingPage.tsx';
 
 export const ProtectedComponent: React.FC<{ child: React.ReactNode }> = ({
   child,
@@ -61,6 +62,12 @@ const router = createBrowserRouter([
   {
     path: '/search',
     element: <ProtectedComponent child={<SearchPage />}></ProtectedComponent>,
+  },
+  {
+    path: '/manga-reading/:providerName',
+    element: (
+      <ProtectedComponent child={<MangeReadingPage />}></ProtectedComponent>
+    ),
   },
   {
     path: '/settings',

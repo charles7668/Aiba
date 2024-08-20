@@ -96,9 +96,9 @@ namespace Aiba.Repository
             return libraryInfo;
         }
 
-        public Task<bool> HasMediaInfoByImagePath(string imagePath)
+        public Task<bool> HasMediaInfoByImageUrl(string imageUrl)
         {
-            return MediaInfoRepository.HasMediaInfoByImagePath(imagePath);
+            return MediaInfoRepository.HasMediaInfoByImageUrl(imageUrl);
         }
 
         public async Task RemoveMediaInfo(string userId, string libraryName, MediaInfo mediaInfo)

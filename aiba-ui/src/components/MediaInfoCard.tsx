@@ -34,7 +34,10 @@ export const MediaInfoCard: React.FC<MediaCardProps> = ({
   libraryInfo,
   ...props
 }) => {
-  const realImageUrl = UrlHelper.ImageUrlConverter(mediaInfo.imageUrl);
+  const realImageUrl = UrlHelper.ImageUrlConverter(
+    mediaInfo.url,
+    mediaInfo.imageUrl
+  );
   let detailLink =
     '/detail/' +
     encodeURIComponent(mediaInfo.providerName) +

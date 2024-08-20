@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { MediaInfo } from '../models/MediaInfo';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Api } from '../services/Api.ts';
 import { UrlHelper } from '../services/UrlHelper.ts';
 
@@ -45,12 +45,16 @@ const mediaInfoTags: React.FC<{ mediaInfo: MediaInfo }> = ({ mediaInfo }) => {
   );
 };
 
-const mediaDetailContent: React.FC<{ mediaInfo: MediaInfo }> = ({
-  mediaInfo,
-}) => {
+const mediaDetailContent: React.FC<{
+  mediaInfo: MediaInfo;
+  onStartView?: () => void;
+}> = ({ mediaInfo, onStartView }) => {
   let realImageUrl = mediaInfo.url;
   if (isLocalProvider) {
-    realImageUrl = UrlHelper.ImageUrlConverter(mediaInfo.imageUrl);
+    realImageUrl = UrlHelper.ImageUrlConverter(
+      mediaInfo.url,
+      mediaInfo.imageUrl
+    );
   }
   return (
     <Flex
@@ -93,7 +97,13 @@ const mediaDetailContent: React.FC<{ mediaInfo: MediaInfo }> = ({
             Provider Name : {mediaInfo.providerName}
           </Link>
           <HStack spacing={2}>
-            <Button size="sm" colorScheme="orange">
+            <Button
+              size="sm"
+              colorScheme="orange"
+              onClick={() => {
+                if (onStartView) onStartView();
+              }}
+            >
               Start Reading
             </Button>
           </HStack>
@@ -109,9 +119,20 @@ export const MediaDetailPage = () => {
   const [searchParams] = useSearchParams();
   const url = searchParams.get('url');
   const libraryName = searchParams.get('library');
+  const navigate = useNavigate();
   if (providerName?.toLowerCase() === 'local') {
     isLocalProvider = true;
   }
+  const onStartView = () => {
+    navigate(
+      '/manga-reading/' +
+        providerName +
+        '?url=' +
+        url +
+        '&library=' +
+        libraryName
+    );
+  };
 
   useEffect(() => {
     if (providerName !== undefined && url != undefined) {
@@ -122,6 +143,12 @@ export const MediaDetailPage = () => {
   }, [libraryName, providerName, url]);
 
   return (
-    <>{!mediaInfo ? <div>no data</div> : mediaDetailContent({ mediaInfo })}</>
+    <>
+      {!mediaInfo ? (
+        <div>no data</div>
+      ) : (
+        mediaDetailContent({ mediaInfo, onStartView })
+      )}
+    </>
   );
 };

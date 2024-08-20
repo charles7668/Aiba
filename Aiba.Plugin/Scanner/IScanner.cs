@@ -10,5 +10,9 @@ namespace Aiba.Plugin.Scanner
 
         public Task<Result> ScanAsync(string libraryRootPath, Func<MediaInfo, Result> callback,
             CancellationToken cancellationToken);
+
+        public Task<IEnumerable<string>> GetMediaListAsync(string libraryRootPath, string mediaUrl,
+            string? charpterName,
+            CancellationToken cancellationToken);
     }
 }

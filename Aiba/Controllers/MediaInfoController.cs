@@ -2,7 +2,9 @@
 using Aiba.Model;
 using Aiba.Model.RequestParams;
 using Aiba.Plugin;
+using Aiba.Plugin.Scanner;
 using Aiba.Repository;
+using Aiba.Scanners;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
@@ -145,6 +147,37 @@ namespace Aiba.Controllers
             }
 
             return Ok(mediaInfos);
+        }
+
+        [HttpGet("ImageLinks/{providerName}")]
+        public async Task<ActionResult<IEnumerable<string>>> GetImageLinks(string providerName,
+            [FromQuery(Name = "library")] string library, [FromQuery(Name = "url")] string mediaUrl,
+            [FromQuery(Name = "chapter")] string? chapterName = null)
+        {
+            string userId = userManager.GetUserId(User)!;
+            string decodeProviderName = HttpUtility.UrlDecode(providerName);
+            string decodeLibrary = HttpUtility.UrlDecode(library);
+            string decodeMediaUrl = HttpUtility.UrlDecode(mediaUrl);
+            string decodeChapterName = HttpUtility.UrlDecode(chapterName ?? "");
+            if (decodeProviderName.ToLower() == "local")
+            {
+                LibraryInfo? libraryInfo = await unitOfWork.GetLibraryInfo(userId, decodeLibrary);
+                MediaInfo? mediaInfo = await unitOfWork.GetMediaInfo(userId, decodeLibrary, decodeMediaUrl);
+                IScanner? scanner = Program.ServiceProvider.GetRequiredService<ScannerFactory>()
+                    .GetScanner(libraryInfo?.ScannerName ?? "");
+                if (mediaInfo == null || libraryInfo == null || scanner == null)
+                {
+                    return NotFound();
+                }
+
+                IEnumerable<string> result = await scanner.GetMediaListAsync(libraryInfo.Path, mediaInfo.Url,
+                    decodeChapterName,
+                    CancellationToken.None);
+                return Ok(result);
+            }
+
+            // todo from remote provider
+            return Ok(Array.Empty<MediaInfo>());
         }
     }
 }

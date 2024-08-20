@@ -38,11 +38,11 @@ namespace Aiba.Entities
         [MaxLength(50)]
         public MediaTypeFlag Type { get; set; } = MediaTypeFlag.MANGA;
 
-        public GenreEntity[] Genres { get; set; } = [];
+        public ICollection<GenreEntity> Genres { get; set; } = [];
 
-        public TagEntity[] Tags { get; set; } = [];
+        public ICollection<TagEntity> Tags { get; set; } = [];
 
-        public ChapterEntity[] Chapters { get; set; } = [];
+        public ICollection<ChapterEntity> Chapters { get; set; } = [];
 
         [MaxLength(255)]
         public string ProviderName { get; set; } = string.Empty;

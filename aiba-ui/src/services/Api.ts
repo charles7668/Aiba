@@ -231,6 +231,28 @@ const updateUserSetting = async (userSettings: UserSetting) => {
   });
 };
 
+const getImageLinks = async (
+  providerName: string,
+  mediaUrl: string,
+  libraryName: string,
+  chapterName: string | null
+) => {
+  return await fetch(
+    baseUrl +
+      '/api/MediaInfo/ImageLinks/' +
+      encodeURIComponent(providerName) +
+      '?url=' +
+      encodeURIComponent(mediaUrl) +
+      '&library=' +
+      encodeURIComponent(libraryName) +
+      (chapterName ? '&chapter=' + encodeURIComponent(chapterName) : ''),
+    {
+      method: 'GET',
+      credentials: 'include',
+    }
+  );
+};
+
 export const Api = {
   search,
   getDetailInfo,
@@ -249,5 +271,6 @@ export const Api = {
   startMediaInfoScan,
   getUserSetting,
   updateUserSetting,
+  getImageLinks,
   baseUrl,
 };

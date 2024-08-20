@@ -1,4 +1,15 @@
-import { ChapterInfo } from './ChapterInfo.ts';
+export interface ChapterInfo {
+  chapterName: string;
+  chapterUrl: string;
+}
+
+export interface TagInfo {
+  name: string;
+}
+
+export interface GenreInfo {
+  name: string;
+}
 
 export interface MediaInfo {
   name: string;
@@ -8,8 +19,8 @@ export interface MediaInfo {
   url: string;
   status: string;
   type: string;
-  genres: string[];
-  tags: string[];
+  genres: GenreInfo[];
+  tags: TagInfo[];
   chapters: ChapterInfo[];
   providerName: string;
   providerUrl: string;

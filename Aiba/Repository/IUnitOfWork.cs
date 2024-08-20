@@ -13,7 +13,7 @@ namespace Aiba.Repository
         public Task RemoveLibraryByUserIdAsync(string userId, LibraryInfo libraryInfo);
         public Task AddMediaInfoToLibraryAsync(string userId, string libraryName, MediaInfo mediaInfo);
         public Task<LibraryInfo?> GetLibraryInfo(string userId, string libraryName);
-        public Task<bool> HasMediaInfoByImagePath(string imagePath);
+        public Task<bool> HasMediaInfoByImageUrl(string imageUrl);
         public Task RemoveMediaInfo(string userId, string libraryName, MediaInfo mediaInfo);
         public Task<UserSetting> GetUserSettingAsync(string userId);
         public Task UpdateUserSettingAsync(string userId, UserSetting userSetting);
