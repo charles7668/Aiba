@@ -31,7 +31,7 @@ export const LoginPage: React.FC = () => {
         navigate('/');
       }
     });
-  });
+  }, [login, navigate]);
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const response = await Api.login(userName, password);
@@ -53,11 +53,11 @@ export const LoginPage: React.FC = () => {
     <Flex
       height="100vh"
       maxHeight={'100vh'}
-      alignItems="center"
+      alignItems="start"
       justifyContent="center"
-      bg="gray.100"
+      overflowY="auto"
     >
-      <Box bg="white" p={6} rounded="md" boxShadow="lg" width="sm">
+      <Box p={6} rounded="md" boxShadow="lg" width="sm">
         <Heading mb={6} textAlign="center">
           Login
         </Heading>
