@@ -25,6 +25,7 @@ export const ProtectedComponent: React.FC<{ child: React.ReactNode }> = ({
         display={'flex'}
         flexDirection={'column'}
         maxH={'100vh'}
+        height="100vh"
         overflowY={'auto'}
       >
         <TopToolBar />
