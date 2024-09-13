@@ -7,6 +7,7 @@ import {
   FormLabel,
   Heading,
   Input,
+  Link,
   useToast,
 } from '@chakra-ui/react';
 import React from 'react';
@@ -56,13 +57,13 @@ export const RegisterPage: React.FC = () => {
     <Flex
       height="100vh"
       maxHeight={'100vh'}
-      alignItems="center"
+      alignItems="start"
       justifyContent="center"
-      bg="gray.100"
+      overflowY="auto"
     >
-      <Box bg="white" p={6} rounded="md" boxShadow="lg" width="sm">
+      <Box p={6} rounded="md" boxShadow="lg" width="sm">
         <Heading mb={6} textAlign="center">
-          Login
+          Register
         </Heading>
         <form onSubmit={handleLogin}>
           <FormControl mb={4}>
@@ -109,8 +110,13 @@ export const RegisterPage: React.FC = () => {
             />
             <FormHelperText>enter your password again</FormHelperText>
           </FormControl>
+          <Box mb={4} textAlign="center">
+            <Link href={'/account/login'} color="teal.500">
+              Have an account? Login here
+            </Link>
+          </Box>
           <Button colorScheme="blue" type="submit" width="full">
-            Login
+            Submit
           </Button>
         </form>
       </Box>
