@@ -1,5 +1,6 @@
 ﻿using Aiba.Helpers;
 using Aiba.Repository;
+using Aiba.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
@@ -26,9 +27,10 @@ namespace Aiba.Controllers
             // check if the file is in mediainfo table
             try
             {
+                IAppPathService appPathService = HttpContext.RequestServices.GetRequiredService<IAppPathService>();
                 // for security, check if the image path is in the media path
                 // and media path is in the database
-                if (!imagePath.StartsWith(mediaUrl))
+                if (!imagePath.StartsWith(mediaUrl) && !imagePath.StartsWith(appPathService.CoverPath))
                     return NotFound();
                 if (!await unitOfWork.HasMediaInfoByImageUrl(mediaUrl.ToFileProtocol()))
                     return NotFound();

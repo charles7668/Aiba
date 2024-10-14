@@ -8,7 +8,7 @@ namespace Aiba.Plugin.Scanner
         public MediaTypeFlag SupportedMediaType { get; }
         public string Name { get; }
 
-        public Task<Result> ScanAsync(string libraryRootPath, Func<MediaInfo, Result> callback,
+        public Task<Result> ScanAsync(string libraryRootPath, Func<MediaInfoScanCallback, Task<Result>> callback,
             CancellationToken cancellationToken);
 
         public Task<IEnumerable<string>> GetMediaListAsync(string libraryRootPath, string mediaUrl,

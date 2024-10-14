@@ -1,8 +1,9 @@
-﻿using Aiba.Model;
+﻿using Aiba.Extensions;
+using Aiba.Model;
 using Aiba.Plugin.Scanner;
 using Aiba.Repository;
 using Aiba.Scanners;
-using System.Runtime.CompilerServices;
+using Aiba.Services;
 using Exception = System.Exception;
 
 namespace Aiba.TaskManager
@@ -21,22 +22,55 @@ namespace Aiba.TaskManager
             ScannerFactory scannerFactory = scope.GetRequiredService<ScannerFactory>();
             IUnitOfWork unitOfWork = scope.GetRequiredService<IUnitOfWork>();
             IScanner? scanner = scannerFactory.GetScanner(scannerName);
+            IAppPathService appPathService = scope.GetRequiredService<IAppPathService>();
             if (scanner == null)
             {
                 return;
             }
 
-            scanner.ScanAsync(libraryInfo.Path, mediaInfo =>
+            scanner.ScanAsync(libraryInfo.Path, async callbackParam =>
             {
+                MediaInfo mediaInfo = callbackParam.MediaInfo;
+                string coverExt = callbackParam.CoverExt;
+                if (string.IsNullOrWhiteSpace(coverExt))
+                    coverExt = ".jpg";
+                else if (coverExt[0] != '.')
+                    coverExt = "." + coverExt;
+                string coverGuid = Guid.NewGuid().ToString();
+                string coverPath = Path.Combine(appPathService.CoverPath, $"{coverGuid}{coverExt}");
                 try
                 {
-                    ConfiguredTaskAwaitable temp = unitOfWork
-                        .AddMediaInfoToLibraryAsync(userId, libraryInfo.Name, mediaInfo)
-                        .ConfigureAwait(false);
-                    temp.GetAwaiter().GetResult();
+                    MediaInfo? info = await unitOfWork.GetMediaInfoAsync(userId, libraryInfo.Name, mediaInfo.Url);
+                    if (info == null)
+                    {
+                        if (mediaInfo.ImageUrl.StartsWith("file://"))
+                        {
+                            File.Copy(mediaInfo.ImageUrl[7..], coverPath);
+                            mediaInfo.ImageUrl = $"file://{coverPath}";
+                        }
+                        else if (!mediaInfo.ImageUrl.IsHttpLink())
+                        {
+                            byte[] bytes = Convert.FromBase64String(mediaInfo.ImageUrl);
+                            await File.WriteAllBytesAsync(coverPath, bytes, cancellationToken);
+                            mediaInfo.ImageUrl = $"file://{coverPath}";
+                        }
+
+                        await unitOfWork.AddMediaInfoToLibraryAsync(userId, libraryInfo.Name, mediaInfo);
+                    }
                 }
                 catch (Exception e)
                 {
+                    if (!File.Exists(coverPath))
+                        return Result.Failure(e.Message);
+                    try
+                    {
+                        File.Delete(coverPath);
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+
                     // ignore
                     return Result.Failure(e.Message);
                 }

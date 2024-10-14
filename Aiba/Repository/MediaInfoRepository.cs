@@ -1,4 +1,5 @@
 ﻿using Aiba.Entities;
+using Aiba.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Aiba.Repository

@@ -29,12 +29,12 @@ namespace Aiba.Repository
             return result;
         }
 
-        public async Task<MediaInfo?> GetMediaInfo(string userId, string libraryName, string imagePath)
+        public async Task<MediaInfo?> GetMediaInfoAsync(string userId, string libraryName, string mediaPath)
         {
             LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
             if (libraryEntity == null)
                 return null;
-            MediaInfoEntity? mediaInfoEntity = await MediaInfoRepository.GetMediaInfo(libraryEntity.Id, imagePath);
+            MediaInfoEntity? mediaInfoEntity = await MediaInfoRepository.GetMediaInfo(libraryEntity.Id, mediaPath);
             if (mediaInfoEntity == null)
                 return null;
             var mediaInfo = new MediaInfo();

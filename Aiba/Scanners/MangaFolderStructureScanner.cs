@@ -2,6 +2,7 @@
 using Aiba.Helpers;
 using Aiba.Model;
 using Aiba.Plugin.Scanner;
+using System.IO.Compression;
 
 namespace Aiba.Scanners
 {
@@ -20,7 +21,7 @@ namespace Aiba.Scanners
         public MediaTypeFlag SupportedMediaType => MediaTypeFlag.MANGA;
         public string Name => "MangaFolderStructureScanner";
 
-        public Task<Result> ScanAsync(string libraryRootPath, Func<MediaInfo, Result> callback,
+        public async Task<Result> ScanAsync(string libraryRootPath, Func<MediaInfoScanCallback, Task<Result>> callback,
             CancellationToken cancellationToken)
         {
             var scanningQueue = new Queue<string>();
@@ -40,7 +41,7 @@ namespace Aiba.Scanners
                         ProviderName = "local",
                         Type = "manga"
                     };
-                    callback(mediaInfo);
+                    await callback(new MediaInfoScanCallback(mediaInfo, Path.GetExtension(firstImage)));
                 }
 
                 IEnumerable<string> cbzFiles =
@@ -50,15 +51,38 @@ namespace Aiba.Scanners
                     if (cancellationToken.IsCancellationRequested)
                         break;
                     string cbzFullPath = Path.GetFullPath(cbzFile);
+                    string imageUrl = string.Empty;
+                    string imageExt = ".jpg";
+                    await using (var zipToOpen = new FileStream(cbzFullPath, FileMode.Open))
+                    {
+                        using (var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
+                        {
+                            foreach (ZipArchiveEntry entry in archive.Entries)
+                            {
+                                if (!_SupportImageExtension.Contains(Path.GetExtension(entry.Name)))
+                                    continue;
+                                await using Stream fileStream = entry.Open();
+                                using var memoryStream = new MemoryStream();
+                                await fileStream.CopyToAsync(memoryStream, cancellationToken);
+
+                                byte[] fileBytes = memoryStream.ToArray();
+
+                                imageUrl = Convert.ToBase64String(fileBytes);
+                                imageExt = Path.GetExtension(entry.Name);
+                                break;
+                            }
+                        }
+                    }
+
                     var mediaInfo = new MediaInfo
                     {
                         Name = Path.GetFileNameWithoutExtension(cbzFile),
                         Url = "file://" + cbzFullPath,
-                        ImageUrl = "file://" + cbzFullPath,
+                        ImageUrl = imageUrl,
                         ProviderName = "local",
                         Type = "manga"
                     };
-                    callback(mediaInfo);
+                    await callback(new MediaInfoScanCallback(mediaInfo, imageExt));
                 }
 
                 IEnumerable<string> directories = Directory.EnumerateDirectories(path);
@@ -70,7 +94,7 @@ namespace Aiba.Scanners
                 }
             }
 
-            return Task.FromResult(Result.Success());
+            return Result.Success();
         }
 
         public Task<IEnumerable<string>> GetMediaListAsync(string libraryRootPath, string mediaUrl,

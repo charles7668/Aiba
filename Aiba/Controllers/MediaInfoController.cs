@@ -5,6 +5,7 @@ using Aiba.Plugin;
 using Aiba.Plugin.Scanner;
 using Aiba.Repository;
 using Aiba.Scanners;
+using Aiba.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
@@ -44,7 +45,7 @@ namespace Aiba.Controllers
                 try
                 {
                     libraryName ??= "";
-                    MediaInfo? mediaInfo = await unitOfWork.GetMediaInfo(userId, libraryName,
+                    MediaInfo? mediaInfo = await unitOfWork.GetMediaInfoAsync(userId, libraryName,
                         decodeUrl.StartsWith("file://") ? decodeUrl : "file://" + decodeUrl);
                     if (mediaInfo == null)
                     {
@@ -108,6 +109,21 @@ namespace Aiba.Controllers
                 userId);
 
             await unitOfWork.RemoveMediaInfo(userId, request.LibraryInfo.Name, request.MediaInfo);
+            if (!request.MediaInfo.Url.StartsWith("file://"))
+                return Ok();
+            IAppPathService appPathService = HttpContext.RequestServices.GetRequiredService<IAppPathService>();
+            string coverPath = request.MediaInfo.ImageUrl[7..];
+            if (!coverPath.StartsWith(appPathService.CoverPath))
+                return Ok();
+            try
+            {
+                System.IO.File.Delete(coverPath);
+            }
+            catch
+            {
+                // ignore
+            }
+
             return Ok();
         }
 
@@ -115,7 +131,7 @@ namespace Aiba.Controllers
         public async Task<ActionResult<IEnumerable<MediaInfo>>> GetMediaInfosFromLibrary([FromQuery] string libraryName,
             [FromQuery(Name = "page")] string pageString = "")
         {
-            var parseResult = int.TryParse(pageString, out var page);
+            bool parseResult = int.TryParse(pageString, out int page);
             if (!parseResult && string.IsNullOrEmpty(pageString))
             {
                 logger.LogWarning("Page param is not number, use default value 1");
@@ -162,7 +178,7 @@ namespace Aiba.Controllers
             if (decodeProviderName.ToLower() == "local")
             {
                 LibraryInfo? libraryInfo = await unitOfWork.GetLibraryInfo(userId, decodeLibrary);
-                MediaInfo? mediaInfo = await unitOfWork.GetMediaInfo(userId, decodeLibrary, decodeMediaUrl);
+                MediaInfo? mediaInfo = await unitOfWork.GetMediaInfoAsync(userId, decodeLibrary, decodeMediaUrl);
                 IScanner? scanner = Program.ServiceProvider.GetRequiredService<ScannerFactory>()
                     .GetScanner(libraryInfo?.ScannerName ?? "");
                 if (mediaInfo == null || libraryInfo == null || scanner == null)

@@ -7,7 +7,7 @@ namespace Aiba.Repository
         public Task<IEnumerable<MediaInfo>>
             GetMediaInfos(string userId, string libraryName, int page, int countPerPage);
 
-        public Task<MediaInfo?> GetMediaInfo(string userId, string libraryName, string imagePath);
+        public Task<MediaInfo?> GetMediaInfoAsync(string userId, string libraryName, string mediaPath);
         public Task AddLibraryInfoByUserIdAsync(string userId, LibraryInfo libraryInfo);
         public Task<IEnumerable<LibraryInfo>> GetLibraryInfosByUserIdAsync(string userId);
         public Task RemoveLibraryByUserIdAsync(string userId, LibraryInfo libraryInfo);

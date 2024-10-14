@@ -1,6 +1,7 @@
 using Aiba.Entities;
 using Aiba.Extensions;
 using Aiba.Repository;
+using Aiba.Services;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authorization;
@@ -89,6 +90,8 @@ namespace Aiba
             });
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            builder.Services.AddSingleton<IAppPathService, AppPathService>();
 
             WebApplication app = builder.Build();
 
