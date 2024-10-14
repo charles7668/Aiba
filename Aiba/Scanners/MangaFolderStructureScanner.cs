@@ -74,7 +74,7 @@ namespace Aiba.Scanners
         }
 
         public Task<IEnumerable<string>> GetMediaListAsync(string libraryRootPath, string mediaUrl,
-            string? charpterName,
+            string? chapterName,
             CancellationToken cancellationToken)
         {
             var directoryInfo = new DirectoryInfo(mediaUrl.TrimFileProtocol());

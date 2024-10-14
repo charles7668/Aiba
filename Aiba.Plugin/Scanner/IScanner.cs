@@ -12,7 +12,7 @@ namespace Aiba.Plugin.Scanner
             CancellationToken cancellationToken);
 
         public Task<IEnumerable<string>> GetMediaListAsync(string libraryRootPath, string mediaUrl,
-            string? charpterName,
+            string? chapterName,
             CancellationToken cancellationToken);
     }
 }
