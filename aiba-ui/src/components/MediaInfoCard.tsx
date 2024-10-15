@@ -43,10 +43,10 @@ export const MediaInfoCard: React.FC<MediaCardProps> = ({
   return (
     <Flex
       flexDirection={'column'}
-      maxW={'250px'}
-      width={'250px'}
-      maxH={'350px'}
-      height={'350px'}
+      maxW={'200px'}
+      width={'200px'}
+      maxH={'300px'}
+      height={'300px'}
       borderWidth="1px"
       borderColor="gray.200"
       position={'relative'}
