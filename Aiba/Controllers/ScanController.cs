@@ -57,7 +57,9 @@ namespace Aiba.Controllers
                 return Unauthorized();
             _logger.LogInformation("Scanning media infos by user {User} , Library : {LibraryName}", userId,
                 request.LibraryName);
-            LibraryInfo libraryInfo = await _unitOfWork.GetLibraryInfo(userId, request.LibraryName);
+            LibraryInfo? libraryInfo = await _unitOfWork.GetLibraryInfo(userId, request.LibraryName);
+            if (libraryInfo == null)
+                return BadRequest("Library not found");
             string scannerName = libraryInfo.ScannerName;
             IScanner? scanner = _scannerFactory.GetScanner(scannerName);
             if (scanner == null)

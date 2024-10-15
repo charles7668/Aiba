@@ -7,12 +7,12 @@ import {
   Menu,
   MenuButton,
   IconButton,
-  createIcon,
 } from '@chakra-ui/react';
 import React, { ReactNode } from 'react';
 import { MediaInfo } from '../models/MediaInfo.ts';
 import { LibraryInfo } from '../models/LibraryInfo.ts';
 import { UrlHelper } from '../services/UrlHelper.ts';
+import { VerticalDotsIcon } from '../icons/VerticalDotsIcon.ts';
 
 interface MediaCardProps {
   mx?: string;
@@ -21,12 +21,6 @@ interface MediaCardProps {
   libraryInfo: LibraryInfo | null;
   menuComponents?: ReactNode;
 }
-
-const VerticalDotsIcon = createIcon({
-  displayName: 'VerticalDotsIcon',
-  viewBox: '0 0 24 24',
-  d: 'M12 16a2 2 0 110 4 2 2 0 010-4zm0-6a2 2 0 110 4 2 2 0 010-4zm0-6a2 2 0 110 4 2 2 0 010-4z',
-});
 
 export const MediaInfoCard: React.FC<MediaCardProps> = ({
   mediaInfo,

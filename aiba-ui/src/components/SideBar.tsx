@@ -1,13 +1,26 @@
-import React from 'react';
-import { Box, Icon, Text, VStack } from '@chakra-ui/react';
+import React, { ReactNode } from 'react';
+import {
+  Box,
+  Icon,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItemProps,
+  MenuList,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { IconType } from 'react-icons';
+import { VerticalDotsIcon } from '../icons/VerticalDotsIcon.ts';
+import { SideBarItemProps } from '../models/SideBarItemProps.ts';
 
 const SidebarItem: React.FC<{
   icon: React.ElementType;
   title: string;
   to: string | (() => void);
-}> = ({ icon, title, to }) => {
+  MenuProp?: ReactNode;
+}> = ({ icon, title, to, MenuProp }) => {
   const navigate = useNavigate();
   return (
     <Box
@@ -31,12 +44,39 @@ const SidebarItem: React.FC<{
         <Icon as={icon} mr={3} boxSize={6} />
         <Text>{title}</Text>
       </Box>
+      {MenuProp && MenuProp}
     </Box>
   );
 };
 
+interface SideBarItemSubMenuProps {
+  items?: Array<MenuItemProps>;
+}
+
+const SideBarItemSubMenu: React.FC<SideBarItemSubMenuProps> = (props) => {
+  return (
+    props.items && (
+      <Menu>
+        <MenuButton
+          as={IconButton}
+          aria-label="Options"
+          icon={<VerticalDotsIcon />}
+          variant={'unstyled'}
+          color={'white'}
+          size={'xs'}
+        />
+        <MenuList>
+          {props.items.map((item, index) => (
+            <MenuItem key={index} {...(item as MenuItemProps)}></MenuItem>
+          ))}
+        </MenuList>
+      </Menu>
+    )
+  );
+};
+
 export const SideBar: React.FC<{
-  items: Array<{ icon: IconType; title: string; to: string | (() => void) }>;
+  items: Array<SideBarItemProps>;
 }> = ({ items }) => {
   return (
     <VStack align="start" spacing={4} minW={'10em'}>
@@ -46,6 +86,7 @@ export const SideBar: React.FC<{
           icon={item.icon}
           title={item.title}
           to={item.to}
+          MenuProp={<SideBarItemSubMenu items={item.menuItems} />}
         ></SidebarItem>
       ))}
     </VStack>

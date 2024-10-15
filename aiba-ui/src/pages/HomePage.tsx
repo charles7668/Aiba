@@ -4,6 +4,7 @@ import {
   Flex,
   IconButton,
   MenuItem,
+  MenuItemProps,
   MenuList,
   Spinner,
   VStack,
@@ -17,9 +18,10 @@ import { MediaInfoCard } from '../components/MediaInfoCard.tsx';
 import { MdRefresh } from 'react-icons/md';
 import { FixedCountPagination } from '../components/Pagination.tsx';
 import { useParams } from 'react-router-dom';
+import { SideBarItemProps } from '../models/SideBarItemProps.ts';
 
 export const HomePage: React.FC = () => {
-  const [libraries, setLibraries] = React.useState([]);
+  const [libraries, setLibraries] = React.useState<Array<SideBarItemProps>>([]);
   const [mediaInfos, setMediaInfos] = React.useState<Array<MediaInfo>>([]);
   const [selectedLibrary, setSelectedLibrary] =
     React.useState<LibraryInfo | null>(null);
@@ -67,6 +69,7 @@ export const HomePage: React.FC = () => {
       }
     };
   };
+
   useEffect(() => {
     Api.getLibraries().then(async (response) => {
       if (response.status !== 200) {
@@ -79,7 +82,17 @@ export const HomePage: React.FC = () => {
             icon: VscLibrary,
             title: library.name,
             to: '/collection/' + encodeURIComponent(library.name),
-          };
+            menuItems: [
+              {
+                children: 'Scan',
+                onClick: () => {
+                  Api.startMediaInfoScan({
+                    libraryName: library.name,
+                  });
+                },
+              },
+            ] as Array<MenuItemProps>,
+          } as SideBarItemProps;
         })
       );
       const targetLibraryName = initLibraryName
@@ -93,7 +106,8 @@ export const HomePage: React.FC = () => {
         setSelectedLibrary(targetLibrary);
       }
     });
-  }, [initLibraryName, selectedLibrary?.name]);
+  }, [initLibraryName]);
+
   useEffect(() => {
     if (selectedLibrary === null) {
       return;
@@ -102,6 +116,21 @@ export const HomePage: React.FC = () => {
       setIsLoading(false);
     });
   }, [currentPage, selectedLibrary]);
+
+  useEffect(() => {
+    if (selectedLibrary === null) {
+      return;
+    }
+    Api.getMediaInfoScanStatus(selectedLibrary.name).then(async (response) => {
+      if (response.status !== 200) {
+        return;
+      }
+      const isScanning = await response.text();
+      console.log(isScanning);
+      setIsScanning(isScanning === 'true');
+    });
+  }, [selectedLibrary]);
+
   return (
     <InformationContext.Provider
       value={{
