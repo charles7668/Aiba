@@ -210,6 +210,16 @@ const getMediaInfoScanStatus = async (libraryName: string) => {
   });
 };
 
+const getMediaInfoCount = async (libraryName: string) => {
+  return await fetch(baseUrl + '/api/MediaInfo/Count/' + libraryName, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+};
+
 const getUserSetting = async () => {
   return await fetch(baseUrl + '/api/Setting', {
     method: 'GET',
@@ -268,6 +278,7 @@ export const Api = {
   getMediaInfosFromLibrary,
   getScannerList,
   getMediaInfoScanStatus,
+  getMediaInfoCount,
   startMediaInfoScan,
   getUserSetting,
   updateUserSetting,

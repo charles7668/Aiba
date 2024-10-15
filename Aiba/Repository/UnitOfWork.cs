@@ -29,6 +29,14 @@ namespace Aiba.Repository
             return result;
         }
 
+        public async Task<int> GetMediaInfosCount(string userId, string libraryName)
+        {
+            LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
+            if (libraryEntity == null)
+                return 0;
+            return await MediaInfoRepository.Count(userId, libraryEntity);
+        }
+
         public async Task<MediaInfo?> GetMediaInfoAsync(string userId, string libraryName, string mediaPath)
         {
             LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);

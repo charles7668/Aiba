@@ -27,6 +27,7 @@ export const HomePage: React.FC = () => {
     React.useState<LibraryInfo | null>(null);
   const [isScanning, setIsScanning] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [totalPage, setTotalPage] = React.useState(1);
   const { libraryName: initLibraryName } = useParams<{ libraryName: string }>();
   const [isLoading, setIsLoading] = React.useState(true);
   let timerId: NodeJS.Timeout | undefined = undefined;
@@ -126,8 +127,15 @@ export const HomePage: React.FC = () => {
         return;
       }
       const isScanning = await response.text();
-      console.log(isScanning);
       setIsScanning(isScanning === 'true');
+    });
+    Api.getMediaInfoCount(selectedLibrary.name).then(async (response) => {
+      if (response.status !== 200) {
+        return;
+      }
+      const countString = await response.text();
+      const count = parseInt(countString);
+      setTotalPage(Math.ceil(count / 20));
     });
   }, [selectedLibrary]);
 
@@ -171,16 +179,16 @@ export const HomePage: React.FC = () => {
             {selectedLibrary && (
               <FixedCountPagination
                 currentPage={currentPage}
-                maxPage={1}
+                maxPage={totalPage}
                 onNextPageClick={() => {
-                  if (currentPage < 2) return;
+                  if (currentPage + 1 > totalPage) return;
                   setCurrentPage(currentPage + 1);
                 }}
                 onPreviousPageClick={() => {
-                  if (currentPage > 0) return;
+                  if (currentPage - 1 < 0) return;
                   setCurrentPage(currentPage - 1);
                 }}
-                onTargetPageClick={(page) => () => {
+                onTargetPageClick={(page) => {
                   setCurrentPage(page);
                 }}
               ></FixedCountPagination>

@@ -15,5 +15,7 @@ namespace Aiba.Repository
         public Task<bool> HasMediaInfoByImageUrl(string imagePath);
 
         public Task Remove(string userId, MediaInfoEntity entity);
+
+        public Task<int> Count(string userId , LibraryEntity libraryEntity);
     }
 }

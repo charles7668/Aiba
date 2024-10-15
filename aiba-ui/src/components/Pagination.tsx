@@ -6,7 +6,7 @@ interface PaginationProps {
   onNextPageClick: () => void;
   onPreviousPageClick: () => void;
   maxPage?: number;
-  onTargetPageClick?: (page: number) => () => void;
+  onTargetPageClick?: (page: number) => void;
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
@@ -36,7 +36,7 @@ export const FixedCountPagination: React.FC<PaginationProps> = ({
       <Button onClick={onPreviousPageClick} disabled={currentPage < 2}>
         Previous
       </Button>
-      <Select width={'xs'}>
+      <Select width={'xs'} value={currentPage}>
         {Array.from({ length: maxPage ?? 0 }, (_, i) => (
           <option
             key={i + 1}

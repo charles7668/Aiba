@@ -1,5 +1,4 @@
 ﻿using Aiba.Entities;
-using Aiba.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Aiba.Repository
@@ -39,6 +38,11 @@ namespace Aiba.Repository
         {
             context.MediaInfos.Remove(entity);
             return Task.CompletedTask;
+        }
+
+        public Task<int> Count(string userId, LibraryEntity libraryEntity)
+        {
+            return Task.FromResult(context.MediaInfos.Count(x => x.LibraryId == libraryEntity.Id));
         }
     }
 }

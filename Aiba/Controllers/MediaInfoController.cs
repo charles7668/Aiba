@@ -195,5 +195,33 @@ namespace Aiba.Controllers
             // todo from remote provider
             return Ok(Array.Empty<MediaInfo>());
         }
+
+        [HttpGet("Count/{libraryName}")]
+        public async Task<ActionResult<int>> GetMediaInfoCount(string libraryName)
+        {
+            string? userId = userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            LibraryInfo libraryInfo = new()
+            {
+                Name = libraryName
+            };
+
+            int count;
+            try
+            {
+                count = await unitOfWork.GetMediaInfosCount(userId, libraryInfo.Name);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "GetMediaInfoCount failed");
+                return BadRequest($"GetMediaInfoCount failed : {e.Message}");
+            }
+
+            return Ok(count);
+        }
     }
 }
