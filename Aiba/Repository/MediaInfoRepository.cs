@@ -29,9 +29,9 @@ namespace Aiba.Repository
             return mediaInfoEntity;
         }
 
-        public Task<bool> HasMediaInfoByImageUrl(string imagePath)
+        public Task<bool> HasMediaInfoByMediaUrl(string mediaUrl)
         {
-            return Task.FromResult(context.MediaInfos.Any(x => x.Url == imagePath));
+            return Task.FromResult(context.MediaInfos.Any(x => x.Url == mediaUrl));
         }
 
         public Task Remove(string userId, MediaInfoEntity entity)

@@ -32,7 +32,7 @@ namespace Aiba.Controllers
                 // and media path is in the database
                 if (!imagePath.StartsWith(mediaUrl) && !imagePath.StartsWith(appPathService.CoverPath))
                     return NotFound();
-                if (!await unitOfWork.HasMediaInfoByImageUrl(mediaUrl.ToFileProtocol()))
+                if (!await unitOfWork.HasMediaInfoByMediaUrl(mediaUrl.ToFileProtocol()))
                     return NotFound();
             }
             catch (Exception e)
