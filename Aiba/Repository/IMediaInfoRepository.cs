@@ -1,5 +1,5 @@
 ﻿using Aiba.Entities;
-using Aiba.Model;
+using System.Linq.Expressions;
 
 namespace Aiba.Repository
 {
@@ -10,7 +10,11 @@ namespace Aiba.Repository
         public Task<IEnumerable<MediaInfoEntity>> GetMediaInfosByLibraryAsync(LibraryEntity libraryEntity, int page,
             int countPerPage);
 
+        public Task<IQueryable<MediaInfoEntity>> EnumerateMediaInfos(
+            Expression<Func<MediaInfoEntity, bool>> queryExpression);
+
         public Task<MediaInfoEntity?> GetMediaInfo(int libraryId, string mediaPath);
+        public Task<MediaInfoEntity?> GetMediaInfoAsync(Expression<Func<MediaInfoEntity, bool>> queryExpression);
 
         public Task<bool> HasMediaInfoByMediaUrl(string mediaUrl);
 

@@ -29,6 +29,21 @@ namespace Aiba.Repository
             return result;
         }
 
+        public async Task EnumerateMediaInfosAsync(string userId, string libraryName, Action<MediaInfo> callback)
+        {
+            LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
+            if (libraryEntity == null)
+                return;
+            IQueryable<MediaInfoEntity>
+                mediaEntities = await MediaInfoRepository.EnumerateMediaInfos(x => x.LibraryId == libraryEntity.Id);
+            foreach (MediaInfoEntity mediaEntity in mediaEntities)
+            {
+                var info = new MediaInfo();
+                MediaInfoEntityMapping.Map(mediaEntity, info);
+                callback(info);
+            }
+        }
+
         public async Task<int> GetMediaInfosCount(string userId, string libraryName)
         {
             LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
@@ -120,6 +135,23 @@ namespace Aiba.Repository
             if (mediaEntity == null)
                 return;
             await MediaInfoRepository.Remove(userId, mediaEntity);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task RemoveMediaInfosAsync(string userId, string libraryName, IEnumerable<MediaInfo> mediaInfos)
+        {
+            LibraryEntity? libraryEntity = await LibraryRepository.GetLibraryEntity(userId, libraryName);
+            if (libraryEntity == null)
+                return;
+            foreach (MediaInfo mediaInfo in mediaInfos)
+            {
+                MediaInfoEntity? mediaEntity =
+                    await MediaInfoRepository.GetMediaInfoAsync(x =>
+                        x.LibraryId == libraryEntity.Id && x.Url == mediaInfo.Url);
+                if (mediaEntity != null)
+                    await MediaInfoRepository.Remove(userId, mediaEntity);
+            }
+
             await context.SaveChangesAsync();
         }
 

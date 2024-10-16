@@ -52,9 +52,9 @@ namespace Aiba.TaskManager
             }
         }
 
-        public string GenerateTaskName(string userId, string libraryName)
+        public string GenerateTaskName(string userId, string libraryName, string action)
         {
-            return "userId:" + userId + ";library:" + libraryName;
+            return "userId:" + userId + ";library:" + libraryName + ";action:" + action;
         }
     }
 }

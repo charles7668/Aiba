@@ -1,5 +1,6 @@
 ﻿using Aiba.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Aiba.Repository
 {
@@ -21,12 +22,25 @@ namespace Aiba.Repository
             return Task.FromResult<IEnumerable<MediaInfoEntity>>(result);
         }
 
+        public Task<IQueryable<MediaInfoEntity>> EnumerateMediaInfos(
+            Expression<Func<MediaInfoEntity, bool>> queryExpression)
+        {
+            return Task.FromResult(context.MediaInfos.Include(x => x.Chapters)
+                .Where(queryExpression));
+        }
+
         public async Task<MediaInfoEntity?> GetMediaInfo(int libraryId, string mediaPath)
         {
             MediaInfoEntity? mediaInfoEntity =
                 await context.MediaInfos.Include(x => x.Chapters)
                     .FirstOrDefaultAsync(x => x.LibraryId == libraryId && x.Url == mediaPath);
             return mediaInfoEntity;
+        }
+
+        public Task<MediaInfoEntity?> GetMediaInfoAsync(Expression<Func<MediaInfoEntity, bool>> queryExpression)
+        {
+            return Task.FromResult(context.MediaInfos.Include(x => x.Chapters)
+                .FirstOrDefault(queryExpression));
         }
 
         public Task<bool> HasMediaInfoByMediaUrl(string mediaUrl)

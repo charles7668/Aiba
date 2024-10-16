@@ -6,6 +6,7 @@ namespace Aiba.Repository
     {
         public Task<IEnumerable<MediaInfo>>
             GetMediaInfos(string userId, string libraryName, int page, int countPerPage);
+        public Task EnumerateMediaInfosAsync(string userId, string libraryName, Action<MediaInfo> callback);
         public Task<int> GetMediaInfosCount(string userId, string libraryName);
         public Task<MediaInfo?> GetMediaInfoAsync(string userId, string libraryName, string mediaPath);
         public Task AddLibraryInfoByUserIdAsync(string userId, LibraryInfo libraryInfo);
@@ -15,6 +16,7 @@ namespace Aiba.Repository
         public Task<LibraryInfo?> GetLibraryInfo(string userId, string libraryName);
         public Task<bool> HasMediaInfoByMediaUrl(string mediaUrl);
         public Task RemoveMediaInfo(string userId, string libraryName, MediaInfo mediaInfo);
+        public Task RemoveMediaInfosAsync(string userId, string libraryName, IEnumerable<MediaInfo> mediaInfos);
         public Task<UserSetting> GetUserSettingAsync(string userId);
         public Task UpdateUserSettingAsync(string userId, UserSetting userSetting);
     }

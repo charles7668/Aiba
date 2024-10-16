@@ -44,7 +44,7 @@ namespace Aiba.Controllers
             string? userId = _userManager.GetUserId(User);
             if (userId == null)
                 return Task.FromResult<ActionResult<bool>>(Unauthorized());
-            string taskName = _taskManager.GenerateTaskName(userId, libraryName);
+            string taskName = _taskManager.GenerateTaskName(userId, libraryName, "ScanMediaInfos");
             bool isRunning = _taskManager.CheckTaskRunning(taskName);
             return Task.FromResult<ActionResult<bool>>(Ok(isRunning));
         }
@@ -68,7 +68,7 @@ namespace Aiba.Controllers
                 return BadRequest("Scanner not found");
             }
 
-            string taskName = _taskManager.GenerateTaskName(userId, libraryInfo.Name);
+            string taskName = _taskManager.GenerateTaskName(userId, libraryInfo.Name, "ScanMediaInfos");
             if (_taskManager.CheckTaskRunning(taskName))
                 return Ok();
             CancellationTokenSource cancellationTokenSource = _taskManager.CreateCancellationTokenSource(taskName);
