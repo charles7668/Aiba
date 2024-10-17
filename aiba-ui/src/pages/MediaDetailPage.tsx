@@ -23,7 +23,7 @@ const mediaInfoGenres: React.FC<{ mediaInfo: MediaInfo }> = ({ mediaInfo }) => {
       {mediaInfo.genres.map((genre, index) => {
         return (
           <Badge key={index} colorScheme="purple">
-            {genre}
+            {genre.name}
           </Badge>
         );
       })}
@@ -37,7 +37,7 @@ const mediaInfoTags: React.FC<{ mediaInfo: MediaInfo }> = ({ mediaInfo }) => {
       {mediaInfo.tags.map((tag, index) => {
         return (
           <Badge key={index} colorScheme="purple">
-            {tag}
+            {tag.name}
           </Badge>
         );
       })}

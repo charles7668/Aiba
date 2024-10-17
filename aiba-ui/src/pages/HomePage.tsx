@@ -62,6 +62,14 @@ export const HomePage: React.FC = () => {
         setIsScanning(false);
         clearInterval(timerId);
       }
+      const mediaCountResponse = await Api.getMediaInfoCount(
+        selectedLibrary.name
+      );
+      if (mediaCountResponse.status === 200) {
+        const countString = await mediaCountResponse.text();
+        const count = parseInt(countString);
+        setTotalPage(Math.ceil(count / 20));
+      }
       await updateMediaInfos(selectedLibrary);
     }, 2000);
     return () => {
